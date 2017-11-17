@@ -1,0 +1,792 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.30.3.8024/W32 for ARM        24/Nov/2014  11:34:23
+# Copyright 1999-2014 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_aes_util.c
+#    Command line =  
+#        "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_aes_util.c"
+#        -D USE_STDPERIPH_DRIVER -D STM32L1XX_XL -lcN "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\List\" -o "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\Obj\" --no_cse --no_unroll
+#        --no_inline --no_code_motion --no_tbaa --no_clustering --no_scheduling
+#        --debug --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0_2\arm\INC\c\DLib_Config_Normal.h" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Device\ST\STM32L1xx\Include\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\inc\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\"
+#        -I "D:\Mes Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Include\" -I
+#        "D:\Mes Documents\ST32\Toolbox_TP1\" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\" -Ol
+#    List file    =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\List\stm32l1xx_aes_util.lst
+#    Object file  =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\Obj\stm32l1xx_aes_util.o
+#
+###############################################################################
+
+D:\Mes Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_aes_util.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    stm32l1xx_aes_util.c
+      4            * @author  MCD Application Team
+      5            * @version V1.3.0
+      6            * @date    31-January-2014
+      7            * @brief   This file provides high level functions to encrypt and decrypt an 
+      8            *          input message using AES in ECB/CBC/CTR modes.
+      9            *
+     10            *  @verbatim
+     11          
+     12          ================================================================================
+     13                                  ##### How to use this driver #####
+     14          ================================================================================
+     15                    [..]
+     16                     (#) Enable The AES controller clock using 
+     17                         RCC_AHBPeriphClockCmd(RCC_AHBPeriph_AES, ENABLE); function.
+     18          
+     19                     (#) Use AES_ECB_Encrypt() function to encrypt an input message in ECB mode.
+     20                     (#) Use AES_ECB_Decrypt() function to decrypt an input message in ECB mode.
+     21          
+     22                     (#) Use AES_CBC_Encrypt() function to encrypt an input message in CBC mode.
+     23                     (#) Use AES_CBC_Decrypt() function to decrypt an input message in CBC mode.
+     24          
+     25                     (#) Use AES_CTR_Encrypt() function to encrypt an input message in CTR mode.
+     26                     (#) Use AES_CTR_Decrypt() function to decrypt an input message in CTR mode.
+     27          
+     28            *  @endverbatim
+     29            *
+     30            ******************************************************************************
+     31            * @attention
+     32            *
+     33            * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+     34            *
+     35            * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+     36            * You may not use this file except in compliance with the License.
+     37            * You may obtain a copy of the License at:
+     38            *
+     39            *        http://www.st.com/software_license_agreement_liberty_v2
+     40            *
+     41            * Unless required by applicable law or agreed to in writing, software 
+     42            * distributed under the License is distributed on an "AS IS" BASIS, 
+     43            * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     44            * See the License for the specific language governing permissions and
+     45            * limitations under the License.
+     46            *
+     47            ******************************************************************************
+     48            */
+     49          
+     50          /* Includes ------------------------------------------------------------------*/
+     51          #include "stm32l1xx_aes.h"
+     52          
+     53          /** @addtogroup STM32L1xx_StdPeriph_Driver
+     54            * @{
+     55            */
+     56          
+     57          /** @addtogroup AES 
+     58            * @brief AES driver modules
+     59            * @{
+     60            */
+     61          
+     62          /* Private typedef -----------------------------------------------------------*/
+     63          /* Private define ------------------------------------------------------------*/
+     64          #define AES_CC_TIMEOUT    ((uint32_t) 0x00010000)
+     65          
+     66          /* Private macro -------------------------------------------------------------*/
+     67          /* Private variables ---------------------------------------------------------*/
+     68          /* Private function prototypes -----------------------------------------------*/
+     69          /* Private functions ---------------------------------------------------------*/
+     70          
+     71          /** @defgroup AES_Private_Functions
+     72            * @{
+     73            */ 
+     74          
+     75          /** @defgroup AES_Group6 High Level AES functions
+     76           *  @brief   High Level AES functions 
+     77           *
+     78          @verbatim
+     79          ================================================================================
+     80                                   ##### High Level AES functions #####
+     81          ================================================================================
+     82          
+     83          @endverbatim
+     84            * @{
+     85            */
+     86          
+     87          /**
+     88            * @brief  Encrypt using AES in ECB Mode
+     89            * @param  Key: Key used for AES algorithm.
+     90            * @param  Input: pointer to the Input buffer.
+     91            * @param  Ilength: length of the Input buffer, must be a multiple of 16 bytes.
+     92            * @param  Output: pointer to the returned buffer.
+     93            * @retval An ErrorStatus enumeration value:
+     94            *          - SUCCESS: Operation done
+     95            *          - ERROR: Operation failed
+     96            */
+     97          ErrorStatus AES_ECB_Encrypt(uint8_t* Key, uint8_t* Input, uint32_t Ilength, uint8_t* Output)
+     98          {
+     99            AES_InitTypeDef AES_InitStructure;
+    100            AES_KeyInitTypeDef  AES_KeyInitStructure;
+    101            ErrorStatus status = SUCCESS;
+    102            uint32_t keyaddr    = (uint32_t)Key;
+    103            uint32_t inputaddr  = (uint32_t)Input;
+    104            uint32_t outputaddr = (uint32_t)Output;
+    105            __IO uint32_t counter = 0;
+    106            uint32_t ccstatus = 0;
+    107            uint32_t i = 0;
+    108          
+    109            /* AES Key initialisation */
+    110            AES_KeyInitStructure.AES_Key3 = __REV(*(uint32_t*)(keyaddr));
+    111            keyaddr += 4;
+    112            AES_KeyInitStructure.AES_Key2 = __REV(*(uint32_t*)(keyaddr));
+    113            keyaddr += 4;
+    114            AES_KeyInitStructure.AES_Key1 = __REV(*(uint32_t*)(keyaddr));
+    115            keyaddr += 4;
+    116            AES_KeyInitStructure.AES_Key0 = __REV(*(uint32_t*)(keyaddr));
+    117            AES_KeyInit(&AES_KeyInitStructure);
+    118          
+    119            /* AES configuration */
+    120            AES_InitStructure.AES_Operation = AES_Operation_Encryp;
+    121            AES_InitStructure.AES_Chaining = AES_Chaining_ECB;
+    122            AES_InitStructure.AES_DataType = AES_DataType_8b;
+    123            AES_Init(&AES_InitStructure);
+    124          
+    125            /* Enable AES */
+    126            AES_Cmd(ENABLE);
+    127          
+    128            for(i = 0; ((i < Ilength) && (status != ERROR)); i += 16)
+    129            {
+    130              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    131              inputaddr += 4;
+    132              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    133              inputaddr += 4;
+    134              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    135              inputaddr += 4;
+    136              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    137              inputaddr += 4;
+    138              
+    139              /* Wait for CCF flag to be set */
+    140              counter = 0;
+    141              do
+    142              {
+    143                ccstatus = AES_GetFlagStatus(AES_FLAG_CCF);
+    144                counter++;
+    145              }while((counter != AES_CC_TIMEOUT) && (ccstatus == RESET));
+    146              
+    147              if (ccstatus == RESET)
+    148              {
+    149                status = ERROR;
+    150              }
+    151              else
+    152              {
+    153                /* Clear CCF flag */
+    154                AES_ClearFlag(AES_FLAG_CCF);
+    155                /* Read cipher text */
+    156                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    157                outputaddr += 4;
+    158                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    159                outputaddr += 4;
+    160                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    161                outputaddr += 4;
+    162                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    163                outputaddr += 4;
+    164              }
+    165            }
+    166            
+    167            /* Disable AES before starting new processing */
+    168            AES_Cmd(DISABLE);
+    169          
+    170            return status;
+    171          }
+    172          
+    173          /**
+    174            * @brief  Decrypt using AES in ECB Mode
+    175            * @param  Key: Key used for AES algorithm.
+    176            * @param  Input: pointer to the Input buffer.
+    177            * @param  Ilength: length of the Input buffer, must be a multiple of 16 bytes.
+    178            * @param  Output: pointer to the returned buffer.
+    179            * @retval An ErrorStatus enumeration value:
+    180            *          - SUCCESS: Operation done
+    181            *          - ERROR: Operation failed
+    182            */
+    183          ErrorStatus AES_ECB_Decrypt(uint8_t* Key, uint8_t* Input, uint32_t Ilength, uint8_t* Output)
+    184          {
+    185            AES_InitTypeDef AES_InitStructure;
+    186            AES_KeyInitTypeDef  AES_KeyInitStructure;
+    187            ErrorStatus status = SUCCESS;
+    188            uint32_t keyaddr    = (uint32_t)Key;
+    189            uint32_t inputaddr  = (uint32_t)Input;
+    190            uint32_t outputaddr = (uint32_t)Output;
+    191            __IO uint32_t counter = 0;
+    192            uint32_t ccstatus = 0;
+    193            uint32_t i = 0;
+    194          
+    195            /* AES Key initialisation */
+    196            AES_KeyInitStructure.AES_Key3 = __REV(*(uint32_t*)(keyaddr));
+    197            keyaddr += 4;
+    198            AES_KeyInitStructure.AES_Key2 = __REV(*(uint32_t*)(keyaddr));
+    199            keyaddr += 4;
+    200            AES_KeyInitStructure.AES_Key1 = __REV(*(uint32_t*)(keyaddr));
+    201            keyaddr += 4;
+    202            AES_KeyInitStructure.AES_Key0 = __REV(*(uint32_t*)(keyaddr));
+    203            AES_KeyInit(&AES_KeyInitStructure);
+    204          
+    205            /* AES configuration */
+    206            AES_InitStructure.AES_Operation = AES_Operation_KeyDerivAndDecryp;
+    207            AES_InitStructure.AES_Chaining = AES_Chaining_ECB;
+    208            AES_InitStructure.AES_DataType = AES_DataType_8b;
+    209            AES_Init(&AES_InitStructure);
+    210          
+    211            /* Enable AES */
+    212            AES_Cmd(ENABLE);
+    213          
+    214            for(i = 0; ((i < Ilength) && (status != ERROR)); i += 16)
+    215            {
+    216              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    217              inputaddr += 4;
+    218              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    219              inputaddr += 4;
+    220              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    221              inputaddr += 4;
+    222              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    223              inputaddr += 4;
+    224              
+    225               /* Wait for CCF flag to be set */
+    226              counter = 0;
+    227              do
+    228              {
+    229                ccstatus = AES_GetFlagStatus(AES_FLAG_CCF);
+    230                counter++;
+    231              }while((counter != AES_CC_TIMEOUT) && (ccstatus == RESET));
+    232              
+    233              if (ccstatus == RESET)
+    234              {
+    235                status = ERROR;
+    236              }
+    237              else
+    238              {
+    239                /* Clear CCF flag */
+    240                AES_ClearFlag(AES_FLAG_CCF);
+    241          
+    242                /* Read cipher text */
+    243                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    244                outputaddr += 4;
+    245                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    246                outputaddr += 4;
+    247                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    248                outputaddr += 4;
+    249                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    250                outputaddr += 4;
+    251              }
+    252            }
+    253          
+    254            /* Disable AES before starting new processing */
+    255            AES_Cmd(DISABLE);
+    256          
+    257            return status;
+    258          }
+    259          
+    260          /**
+    261            * @brief  Encrypt using AES in CBC Mode
+    262            * @param  InitVectors: Initialisation Vectors used for AES algorithm.
+    263            * @param  Key: Key used for AES algorithm.
+    264            * @param  Input: pointer to the Input buffer.
+    265            * @param  Ilength: length of the Input buffer, must be a multiple of 16 bytes.
+    266            * @param  Output: pointer to the returned buffer.
+    267            * @retval An ErrorStatus enumeration value:
+    268            *          - SUCCESS: Operation done
+    269            *          - ERROR: Operation failed
+    270            */
+    271          ErrorStatus AES_CBC_Encrypt(uint8_t* Key, uint8_t InitVectors[16], uint8_t* Input, uint32_t Ilength, uint8_t* Output)
+    272          {
+    273            AES_InitTypeDef AES_InitStructure;
+    274            AES_KeyInitTypeDef  AES_KeyInitStructure;
+    275            AES_IVInitTypeDef AES_IVInitStructure;
+    276            ErrorStatus status = SUCCESS;
+    277            uint32_t keyaddr    = (uint32_t)Key;
+    278            uint32_t inputaddr  = (uint32_t)Input;
+    279            uint32_t outputaddr = (uint32_t)Output;
+    280            uint32_t ivaddr     = (uint32_t)InitVectors;
+    281            __IO uint32_t counter = 0;
+    282            uint32_t ccstatus = 0;
+    283            uint32_t i = 0;
+    284          
+    285            /* AES Key initialisation*/
+    286            AES_KeyInitStructure.AES_Key3 = __REV(*(uint32_t*)(keyaddr));
+    287            keyaddr += 4;
+    288            AES_KeyInitStructure.AES_Key2 = __REV(*(uint32_t*)(keyaddr));
+    289            keyaddr += 4;
+    290            AES_KeyInitStructure.AES_Key1 = __REV(*(uint32_t*)(keyaddr));
+    291            keyaddr += 4;
+    292            AES_KeyInitStructure.AES_Key0 = __REV(*(uint32_t*)(keyaddr));
+    293            AES_KeyInit(&AES_KeyInitStructure);
+    294          
+    295            /* AES Initialization Vectors */
+    296            AES_IVInitStructure.AES_IV3 = __REV(*(uint32_t*)(ivaddr));
+    297            ivaddr += 4;
+    298            AES_IVInitStructure.AES_IV2 = __REV(*(uint32_t*)(ivaddr));
+    299            ivaddr += 4;
+    300            AES_IVInitStructure.AES_IV1 = __REV(*(uint32_t*)(ivaddr));
+    301            ivaddr += 4;
+    302            AES_IVInitStructure.AES_IV0 = __REV(*(uint32_t*)(ivaddr));
+    303            AES_IVInit(&AES_IVInitStructure);
+    304          
+    305            /* AES configuration */
+    306            AES_InitStructure.AES_Operation = AES_Operation_Encryp;
+    307            AES_InitStructure.AES_Chaining = AES_Chaining_CBC;
+    308            AES_InitStructure.AES_DataType = AES_DataType_8b;
+    309            AES_Init(&AES_InitStructure);
+    310          
+    311            /* Enable AES */
+    312            AES_Cmd(ENABLE);
+    313          
+    314            for(i = 0; ((i < Ilength) && (status != ERROR)); i += 16)
+    315            {
+    316              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    317              inputaddr += 4;
+    318              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    319              inputaddr += 4;
+    320              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    321              inputaddr += 4;
+    322              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    323              inputaddr += 4;
+    324              
+    325              /* Wait for CCF flag to be set */
+    326              counter = 0;
+    327              do
+    328              {
+    329                ccstatus = AES_GetFlagStatus(AES_FLAG_CCF);
+    330                counter++;
+    331              }while((counter != AES_CC_TIMEOUT) && (ccstatus == RESET));
+    332              
+    333              if (ccstatus == RESET)
+    334              {
+    335                status = ERROR;
+    336              }
+    337              else
+    338              {
+    339                /* Clear CCF flag */
+    340                AES_ClearFlag(AES_FLAG_CCF);
+    341          
+    342                /* Read cipher text */
+    343                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    344                outputaddr += 4;
+    345                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    346                outputaddr += 4;
+    347                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    348                outputaddr += 4;
+    349                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    350                outputaddr += 4;
+    351              }
+    352            }
+    353          
+    354            /* Disable AES before starting new processing */
+    355            AES_Cmd(DISABLE);
+    356          
+    357            return status;
+    358          }
+    359          
+    360          /**
+    361            * @brief  Decrypt using AES in CBC Mode
+    362            * @param  InitVectors: Initialisation Vectors used for AES algorithm.
+    363            * @param  Key: Key used for AES algorithm.
+    364            * @param  Input: pointer to the Input buffer.
+    365            * @param  Ilength: length of the Input buffer, must be a multiple of 16 bytes.
+    366            * @param  Output: pointer to the returned buffer.
+    367            * @retval An ErrorStatus enumeration value:
+    368            *          - SUCCESS: Operation done
+    369            *          - ERROR: Operation failed
+    370            */
+    371          ErrorStatus AES_CBC_Decrypt(uint8_t* Key, uint8_t InitVectors[16], uint8_t* Input, uint32_t Ilength, uint8_t* Output)
+    372          {
+    373            AES_InitTypeDef AES_InitStructure;
+    374            AES_KeyInitTypeDef  AES_KeyInitStructure;
+    375            AES_IVInitTypeDef AES_IVInitStructure;
+    376            ErrorStatus status = SUCCESS;
+    377            uint32_t keyaddr    = (uint32_t)Key;
+    378            uint32_t inputaddr  = (uint32_t)Input;
+    379            uint32_t outputaddr = (uint32_t)Output;
+    380            uint32_t ivaddr     = (uint32_t)InitVectors;
+    381            __IO uint32_t counter = 0;
+    382            uint32_t ccstatus = 0;
+    383            uint32_t i = 0;
+    384            
+    385            /* AES Key initialisation*/
+    386            AES_KeyInitStructure.AES_Key3 = __REV(*(uint32_t*)(keyaddr));
+    387            keyaddr += 4;
+    388            AES_KeyInitStructure.AES_Key2 = __REV(*(uint32_t*)(keyaddr));
+    389            keyaddr += 4;
+    390            AES_KeyInitStructure.AES_Key1 = __REV(*(uint32_t*)(keyaddr));
+    391            keyaddr += 4;
+    392            AES_KeyInitStructure.AES_Key0 = __REV(*(uint32_t*)(keyaddr));
+    393            AES_KeyInit(&AES_KeyInitStructure);
+    394          
+    395            /* AES Initialization Vectors */
+    396            AES_IVInitStructure.AES_IV3 = __REV(*(uint32_t*)(ivaddr));
+    397            ivaddr += 4;
+    398            AES_IVInitStructure.AES_IV2 = __REV(*(uint32_t*)(ivaddr));
+    399            ivaddr += 4;
+    400            AES_IVInitStructure.AES_IV1 = __REV(*(uint32_t*)(ivaddr));
+    401            ivaddr += 4;
+    402            AES_IVInitStructure.AES_IV0 = __REV(*(uint32_t*)(ivaddr));
+    403            AES_IVInit(&AES_IVInitStructure);
+    404          
+    405            /* AES configuration */
+    406            AES_InitStructure.AES_Operation = AES_Operation_KeyDerivAndDecryp;
+    407            AES_InitStructure.AES_Chaining = AES_Chaining_CBC;
+    408            AES_InitStructure.AES_DataType = AES_DataType_8b;
+    409            AES_Init(&AES_InitStructure);
+    410          
+    411            /* Enable AES */
+    412            AES_Cmd(ENABLE);
+    413          
+    414            for(i = 0; ((i < Ilength) && (status != ERROR)); i += 16)
+    415            {
+    416              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    417              inputaddr += 4;
+    418              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    419              inputaddr += 4;
+    420              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    421              inputaddr += 4;
+    422              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    423              inputaddr += 4;
+    424              
+    425              /* Wait for CCF flag to be set */
+    426              counter = 0;
+    427              do
+    428              {
+    429                ccstatus = AES_GetFlagStatus(AES_FLAG_CCF);
+    430                counter++;
+    431              }while((counter != AES_CC_TIMEOUT) && (ccstatus == RESET));
+    432          
+    433              if (ccstatus == RESET)
+    434              {
+    435                status = ERROR;
+    436              }
+    437              else
+    438              {
+    439                /* Clear CCF flag */
+    440                AES_ClearFlag(AES_FLAG_CCF);
+    441          
+    442                /* Read cipher text */
+    443                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    444                outputaddr += 4;
+    445                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    446                outputaddr += 4;
+    447                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    448                outputaddr += 4;
+    449                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    450                outputaddr += 4;
+    451              }
+    452            }
+    453          
+    454            /* Disable AES before starting new processing */
+    455            AES_Cmd(DISABLE);
+    456          
+    457            return status;
+    458          }
+    459          
+    460          /**
+    461            * @brief  Encrypt using AES in CTR Mode
+    462            * @param  InitVectors: Initialisation Vectors used for AES algorithm.
+    463            * @param  Key: Key used for AES algorithm.
+    464            * @param  Input: pointer to the Input buffer.
+    465            * @param  Ilength: length of the Input buffer, must be a multiple of 16 bytes.
+    466            * @param  Output: pointer to the returned buffer.
+    467            * @retval An ErrorStatus enumeration value:
+    468            *          - SUCCESS: Operation done
+    469            *          - ERROR: Operation failed
+    470            */
+    471          ErrorStatus AES_CTR_Encrypt(uint8_t* Key, uint8_t InitVectors[16], uint8_t* Input, uint32_t Ilength, uint8_t* Output)
+    472          {
+    473            AES_InitTypeDef AES_InitStructure;
+    474            AES_KeyInitTypeDef  AES_KeyInitStructure;
+    475            AES_IVInitTypeDef AES_IVInitStructure;
+    476          
+    477            ErrorStatus status = SUCCESS;
+    478            uint32_t keyaddr    = (uint32_t)Key;
+    479            uint32_t inputaddr  = (uint32_t)Input;
+    480            uint32_t outputaddr = (uint32_t)Output;
+    481            uint32_t ivaddr     = (uint32_t)InitVectors;
+    482            __IO uint32_t counter = 0;
+    483            uint32_t ccstatus = 0;
+    484            uint32_t i = 0;
+    485          
+    486            /* AES key initialisation*/
+    487            AES_KeyInitStructure.AES_Key3 = __REV(*(uint32_t*)(keyaddr));
+    488            keyaddr += 4;
+    489            AES_KeyInitStructure.AES_Key2 = __REV(*(uint32_t*)(keyaddr));
+    490            keyaddr += 4;
+    491            AES_KeyInitStructure.AES_Key1 = __REV(*(uint32_t*)(keyaddr));
+    492            keyaddr += 4;
+    493            AES_KeyInitStructure.AES_Key0 = __REV(*(uint32_t*)(keyaddr));
+    494            AES_KeyInit(&AES_KeyInitStructure);
+    495          
+    496            /* AES Initialization Vectors */
+    497            AES_IVInitStructure.AES_IV3 = __REV(*(uint32_t*)(ivaddr));
+    498            ivaddr += 4;
+    499            AES_IVInitStructure.AES_IV2= __REV(*(uint32_t*)(ivaddr));
+    500            ivaddr += 4;
+    501            AES_IVInitStructure.AES_IV1 = __REV(*(uint32_t*)(ivaddr));
+    502            ivaddr += 4;
+    503            AES_IVInitStructure.AES_IV0= __REV(*(uint32_t*)(ivaddr));
+    504            AES_IVInit(&AES_IVInitStructure);
+    505          
+    506            /* AES configuration */
+    507            AES_InitStructure.AES_Operation = AES_Operation_Encryp;
+    508            AES_InitStructure.AES_Chaining = AES_Chaining_CTR;
+    509            AES_InitStructure.AES_DataType = AES_DataType_8b;
+    510            AES_Init(&AES_InitStructure);
+    511          
+    512            /* Enable AES */
+    513            AES_Cmd(ENABLE);
+    514          
+    515            for(i = 0; ((i < Ilength) && (status != ERROR)); i += 16)
+    516            {
+    517              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    518              inputaddr += 4;
+    519              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    520              inputaddr += 4;
+    521              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    522              inputaddr += 4;
+    523              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    524              inputaddr += 4;
+    525              
+    526              /* Wait for CCF flag to be set */
+    527              counter = 0;
+    528              do
+    529              {
+    530                ccstatus = AES_GetFlagStatus(AES_FLAG_CCF);
+    531                counter++;
+    532              }while((counter != AES_CC_TIMEOUT) && (ccstatus == RESET));
+    533          
+    534              if (ccstatus == RESET)
+    535              {
+    536                status = ERROR;
+    537              }
+    538              else
+    539              {
+    540                /* Clear CCF flag */
+    541                AES_ClearFlag(AES_FLAG_CCF);
+    542          
+    543                /* Read cipher text */
+    544                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    545                outputaddr += 4;
+    546                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    547                outputaddr += 4;
+    548                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    549                outputaddr += 4;
+    550                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    551                outputaddr += 4;
+    552              }
+    553            }
+    554          
+    555            /* Disable AES before starting new processing */
+    556            AES_Cmd(DISABLE);
+    557          
+    558            return status;
+    559          }
+    560          
+    561          /**
+    562            * @brief  Decrypt using AES in CTR Mode
+    563            * @param  InitVectors: Initialisation Vectors used for AES algorithm.
+    564            * @param  Key: Key used for AES algorithm.
+    565            * @param  Input: pointer to the Input buffer.
+    566            * @param  Ilength: length of the Input buffer, must be a multiple of 16 bytes.
+    567            * @param  Output: pointer to the returned buffer.
+    568            * @retval An ErrorStatus enumeration value:
+    569            *          - SUCCESS: Operation done
+    570            *          - ERROR: Operation failed
+    571            */
+    572          ErrorStatus AES_CTR_Decrypt(uint8_t* Key, uint8_t InitVectors[16], uint8_t* Input, uint32_t Ilength, uint8_t* Output)
+    573          {
+    574            AES_InitTypeDef AES_InitStructure;
+    575            AES_KeyInitTypeDef  AES_KeyInitStructure;
+    576            AES_IVInitTypeDef AES_IVInitStructure;
+    577          
+    578            ErrorStatus status = SUCCESS;
+    579            uint32_t keyaddr    = (uint32_t)Key;
+    580            uint32_t inputaddr  = (uint32_t)Input;
+    581            uint32_t outputaddr = (uint32_t)Output;
+    582            uint32_t ivaddr     = (uint32_t)InitVectors;
+    583            __IO uint32_t counter = 0;
+    584            uint32_t ccstatus = 0;
+    585            uint32_t i = 0;
+    586          
+    587            /* AES Key initialisation*/
+    588            AES_KeyInitStructure.AES_Key3 = __REV(*(uint32_t*)(keyaddr));
+    589            keyaddr += 4;
+    590            AES_KeyInitStructure.AES_Key2 = __REV(*(uint32_t*)(keyaddr));
+    591            keyaddr += 4;
+    592            AES_KeyInitStructure.AES_Key1 = __REV(*(uint32_t*)(keyaddr));
+    593            keyaddr += 4;
+    594            AES_KeyInitStructure.AES_Key0 = __REV(*(uint32_t*)(keyaddr));
+    595            AES_KeyInit(&AES_KeyInitStructure);
+    596          
+    597            /* AES Initialization Vectors */
+    598            AES_IVInitStructure.AES_IV3 = __REV(*(uint32_t*)(ivaddr));
+    599            ivaddr += 4;
+    600            AES_IVInitStructure.AES_IV2 = __REV(*(uint32_t*)(ivaddr));
+    601            ivaddr += 4;
+    602            AES_IVInitStructure.AES_IV1 = __REV(*(uint32_t*)(ivaddr));
+    603            ivaddr += 4;
+    604            AES_IVInitStructure.AES_IV0 = __REV(*(uint32_t*)(ivaddr));
+    605            AES_IVInit(&AES_IVInitStructure);
+    606          
+    607            /* AES configuration */
+    608            AES_InitStructure.AES_Operation = AES_Operation_KeyDerivAndDecryp;
+    609            AES_InitStructure.AES_Chaining = AES_Chaining_CTR;
+    610            AES_InitStructure.AES_DataType = AES_DataType_8b;
+    611            AES_Init(&AES_InitStructure);
+    612          
+    613            /* Enable AES */
+    614            AES_Cmd(ENABLE);
+    615          
+    616            for(i = 0; ((i < Ilength) && (status != ERROR)); i += 16)
+    617            {
+    618              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    619              inputaddr += 4;
+    620              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    621              inputaddr += 4;
+    622              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    623              inputaddr += 4;
+    624              AES_WriteSubData(*(uint32_t*)(inputaddr));
+    625              inputaddr += 4;
+    626              
+    627              /* Wait for CCF flag to be set */
+    628              counter = 0;
+    629              do
+    630              {
+    631                ccstatus = AES_GetFlagStatus(AES_FLAG_CCF);
+    632                counter++;
+    633              }while((counter != AES_CC_TIMEOUT) && (ccstatus == RESET));
+    634          
+    635              if (ccstatus == RESET)
+    636              {
+    637                status = ERROR;
+    638              }
+    639              else
+    640              {
+    641                /* Clear CCF flag */
+    642                AES_ClearFlag(AES_FLAG_CCF);
+    643              
+    644                /* Read cipher text */
+    645                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    646                outputaddr += 4;
+    647                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    648                outputaddr += 4;
+    649                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    650                outputaddr += 4;
+    651                *(uint32_t*)(outputaddr) = AES_ReadSubData();
+    652                outputaddr += 4;
+    653              }
+    654            }
+    655          
+    656            /* Disable AES before starting new processing */
+    657            AES_Cmd(DISABLE);
+    658          
+    659            return status;
+    660          }
+    661          
+    662          /**
+    663            * @}
+    664            */
+    665          
+    666          /**
+    667            * @}
+    668            */ 
+    669          
+    670          /**
+    671            * @}
+    672            */ 
+    673          
+    674          /**
+    675            * @}
+    676            */ 
+    677          
+    678          /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+    679          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      80   AES_CBC_Decrypt
+        80   -> AES_ClearFlag
+        80   -> AES_Cmd
+        80   -> AES_GetFlagStatus
+        80   -> AES_IVInit
+        80   -> AES_Init
+        80   -> AES_KeyInit
+        80   -> AES_ReadSubData
+        80   -> AES_WriteSubData
+      80   AES_CBC_Encrypt
+        80   -> AES_ClearFlag
+        80   -> AES_Cmd
+        80   -> AES_GetFlagStatus
+        80   -> AES_IVInit
+        80   -> AES_Init
+        80   -> AES_KeyInit
+        80   -> AES_ReadSubData
+        80   -> AES_WriteSubData
+      80   AES_CTR_Decrypt
+        80   -> AES_ClearFlag
+        80   -> AES_Cmd
+        80   -> AES_GetFlagStatus
+        80   -> AES_IVInit
+        80   -> AES_Init
+        80   -> AES_KeyInit
+        80   -> AES_ReadSubData
+        80   -> AES_WriteSubData
+      80   AES_CTR_Encrypt
+        80   -> AES_ClearFlag
+        80   -> AES_Cmd
+        80   -> AES_GetFlagStatus
+        80   -> AES_IVInit
+        80   -> AES_Init
+        80   -> AES_KeyInit
+        80   -> AES_ReadSubData
+        80   -> AES_WriteSubData
+      56   AES_ECB_Decrypt
+        56   -> AES_ClearFlag
+        56   -> AES_Cmd
+        56   -> AES_GetFlagStatus
+        56   -> AES_Init
+        56   -> AES_KeyInit
+        56   -> AES_ReadSubData
+        56   -> AES_WriteSubData
+      56   AES_ECB_Encrypt
+        56   -> AES_ClearFlag
+        56   -> AES_Cmd
+        56   -> AES_GetFlagStatus
+        56   -> AES_Init
+        56   -> AES_KeyInit
+        56   -> AES_ReadSubData
+        56   -> AES_WriteSubData
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+     280  AES_CBC_Decrypt
+     280  AES_CBC_Encrypt
+     280  AES_CTR_Decrypt
+     280  AES_CTR_Encrypt
+     228  AES_ECB_Decrypt
+     228  AES_ECB_Encrypt
+
+ 
+ 1 576 bytes in section .text
+ 
+ 1 576 bytes of CODE memory
+
+Errors: none
+Warnings: none

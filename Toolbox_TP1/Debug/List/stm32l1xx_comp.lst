@@ -1,0 +1,449 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.30.3.8024/W32 for ARM        24/Nov/2014  11:34:23
+# Copyright 1999-2014 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_comp.c
+#    Command line =  
+#        "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_comp.c"
+#        -D USE_STDPERIPH_DRIVER -D STM32L1XX_XL -lcN "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\List\" -o "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\Obj\" --no_cse --no_unroll
+#        --no_inline --no_code_motion --no_tbaa --no_clustering --no_scheduling
+#        --debug --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0_2\arm\INC\c\DLib_Config_Normal.h" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Device\ST\STM32L1xx\Include\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\inc\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\"
+#        -I "D:\Mes Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Include\" -I
+#        "D:\Mes Documents\ST32\Toolbox_TP1\" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\" -Ol
+#    List file    =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\List\stm32l1xx_comp.lst
+#    Object file  =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\Obj\stm32l1xx_comp.o
+#
+###############################################################################
+
+D:\Mes Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_comp.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    stm32l1xx_comp.c
+      4            * @author  MCD Application Team
+      5            * @version V1.3.0
+      6            * @date    31-January-2014
+      7            * @brief   This file provides firmware functions to manage the following 
+      8            *          functionalities of the comparators (COMP1 and COMP2) peripheral: 
+      9            *           + Comparators configuration
+     10            *           + Window mode control
+     11            *           + Internal Reference Voltage (VREFINT) output
+     12            *
+     13            *  @verbatim
+     14           ===============================================================================
+     15                               ##### How to use this driver #####
+     16           ===============================================================================
+     17              [..] The device integrates two analog comparators COMP1 and COMP2:
+     18                   (+) COMP1 is a fixed threshold (VREFINT) that shares the non inverting
+     19                       input with the ADC channels.
+     20                   (+) COMP2 is a rail-to-rail comparator whose the inverting input can be 
+     21                       selected among: DAC_OUT1, DAC_OUT2, 1/4 VREFINT, 1/2 VERFINT, 3/4 
+     22                       VREFINT, VREFINT, PB3 and whose the output can be redirected to 
+     23                       embedded timers: TIM2, TIM3, TIM4, TIM10.
+     24            
+     25                   (+) The two comparators COMP1 and COMP2 can be combined in window mode.
+     26          
+     27                   -@-
+     28                      (#@) Comparator APB clock must be enabled to get write access
+     29                           to comparator register using
+     30                           RCC_APB1PeriphClockCmd(RCC_APB1Periph_COMP, ENABLE).
+     31            
+     32                      (#@) COMP1 comparator and ADC can't be used at the same time since
+     33                           they share the same ADC switch matrix (analog switches).
+     34            
+     35                      (#@) When an I/O is used as comparator input, the corresponding GPIO 
+     36                           registers should be configured in analog mode.
+     37            
+     38                      (#@) Comparators outputs (CMP1OUT and CMP2OUT) are not mapped on
+     39                           GPIO pin. They are only internal.
+     40                           To get the comparator output level, use COMP_GetOutputLevel().
+     41            
+     42                      (#@) COMP1 and COMP2 outputs are internally connected to EXTI Line 21
+     43                           and EXTI Line 22 respectively.
+     44                           Interrupts can be used by configuring the EXTI Line using the 
+     45                           EXTI peripheral driver.
+     46            
+     47                      (#@) After enabling the comparator (COMP1 or COMP2), user should wait
+     48                           for start-up time (tSTART) to get right output levels.
+     49                           Please refer to product datasheet for more information on tSTART.
+     50            
+     51                      (#@) Comparators cannot be used to exit the device from Sleep or Stop 
+     52                           mode when the internal reference voltage is switched off using 
+     53                           the PWR_UltraLowPowerCmd() function (ULP bit in the PWR_CR register).
+     54            
+     55              @endverbatim
+     56            ******************************************************************************
+     57            * @attention
+     58            *
+     59            * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+     60            *
+     61            * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+     62            * You may not use this file except in compliance with the License.
+     63            * You may obtain a copy of the License at:
+     64            *
+     65            *        http://www.st.com/software_license_agreement_liberty_v2
+     66            *
+     67            * Unless required by applicable law or agreed to in writing, software 
+     68            * distributed under the License is distributed on an "AS IS" BASIS, 
+     69            * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     70            * See the License for the specific language governing permissions and
+     71            * limitations under the License.
+     72            *
+     73            ******************************************************************************
+     74            */
+     75          
+     76          /* Includes ------------------------------------------------------------------*/
+     77          #include "stm32l1xx_comp.h"
+     78          
+     79          /** @addtogroup STM32L1xx_StdPeriph_Driver
+     80            * @{
+     81            */
+     82          
+     83          /** @defgroup COMP 
+     84            * @brief COMP driver modules.
+     85            * @{
+     86            */ 
+     87          
+     88          /* Private typedef -----------------------------------------------------------*/
+     89          /* Private define ------------------------------------------------------------*/
+     90          /* Private macro -------------------------------------------------------------*/
+     91          /* Private variables ---------------------------------------------------------*/
+     92          /* Private function prototypes -----------------------------------------------*/
+     93          /* Private functions ---------------------------------------------------------*/
+     94          
+     95          /** @defgroup COMP_Private_Functions
+     96            * @{
+     97            */
+     98          
+     99          /** @defgroup COMP_Group1 Initialization and Configuration functions
+    100           *  @brief   Initialization and Configuration functions.
+    101           *
+    102          @verbatim
+    103           ===============================================================================
+    104                        ##### Initialization and Configuration functions #####
+    105           ===============================================================================
+    106          
+    107          @endverbatim
+    108            * @{
+    109            */
+    110             
+    111          /**
+    112            * @brief  Deinitializes COMP peripheral registers to their default reset values.
+    113            * @param  None
+    114            * @retval None
+    115            */
+    116          void COMP_DeInit(void)
+    117          {
+    118            COMP->CSR = ((uint32_t)0x00000000);    /*!< Set COMP->CSR to reset value */
+    119          }
+    120          
+    121          /**
+    122            * @brief  Initializes the COMP2 peripheral according to the specified parameters
+    123            *         in the COMP_InitStruct.
+    124            * @note   This function configures only COMP2.
+    125            * @note   COMP2 comparator is enabled as soon as the INSEL[2:0] bits are 
+    126            *         different from "000".
+    127            * @param  COMP_InitStruct: pointer to an COMP_InitTypeDef structure that contains 
+    128            *         the configuration information for the specified COMP peripheral.  
+    129            * @retval None
+    130            */
+    131          void COMP_Init(COMP_InitTypeDef* COMP_InitStruct)
+    132          {
+    133            uint32_t tmpreg = 0;
+    134            
+    135            /* Check the parameters */
+    136            assert_param(IS_COMP_INVERTING_INPUT(COMP_InitStruct->COMP_InvertingInput));
+    137            assert_param(IS_COMP_OUTPUT(COMP_InitStruct->COMP_OutputSelect));
+    138            assert_param(IS_COMP_SPEED(COMP_InitStruct->COMP_Speed));
+    139          
+    140            /*!< Get the COMP CSR value */
+    141            tmpreg = COMP->CSR;
+    142          
+    143            /*!< Clear the  INSEL[2:0], OUTSEL[1:0] and SPEED bits */ 
+    144            tmpreg &= (uint32_t) (~(uint32_t) (COMP_CSR_OUTSEL | COMP_CSR_INSEL | COMP_CSR_SPEED));
+    145            
+    146            /*!< Configure COMP: speed, inversion input selection and output redirection */
+    147            /*!< Set SPEED bit according to COMP_InitStruct->COMP_Speed value */
+    148            /*!< Set INSEL bits according to COMP_InitStruct->COMP_InvertingInput value */ 
+    149            /*!< Set OUTSEL bits according to COMP_InitStruct->COMP_OutputSelect value */  
+    150            tmpreg |= (uint32_t)((COMP_InitStruct->COMP_Speed | COMP_InitStruct->COMP_InvertingInput 
+    151                                  | COMP_InitStruct->COMP_OutputSelect));
+    152          
+    153            /*!< The COMP2 comparator is enabled as soon as the INSEL[2:0] bits value are 
+    154               different from "000" */
+    155            /*!< Write to COMP_CSR register */
+    156            COMP->CSR = tmpreg;  
+    157          }
+    158          
+    159          /**
+    160            * @brief  Enable or disable the COMP1 peripheral.
+    161            * @note   After enabling COMP1, the following functions should be called to 
+    162            *         connect the selected GPIO input to COMP1 non inverting input:
+    163            * @note   Enable switch control mode using SYSCFG_RISwitchControlModeCmd()
+    164            * @note   Close VCOMP switch using SYSCFG_RIIOSwitchConfig()
+    165            * @note   Close the I/O switch number n corresponding to the I/O 
+    166            *         using SYSCFG_RIIOSwitchConfig()
+    167            * @param  NewState: new state of the COMP1 peripheral.
+    168            *         This parameter can be: ENABLE or DISABLE.
+    169            * @note   This function enables/disables only the COMP1.
+    170            * @retval None
+    171            */
+    172          void COMP_Cmd(FunctionalState NewState)
+    173          {
+    174            /* Check the parameter */
+    175            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    176          
+    177            if (NewState != DISABLE)
+    178            {
+    179              /* Enable the COMP1 */
+    180              COMP->CSR |= (uint32_t) COMP_CSR_CMP1EN;
+    181            }
+    182            else
+    183            {
+    184              /* Disable the COMP1  */
+    185              COMP->CSR &= (uint32_t)(~COMP_CSR_CMP1EN);
+    186            }
+    187          }
+    188          
+    189          /**
+    190            * @brief  Return the output level (high or low) of the selected comparator.
+    191            * @note   Comparator output is low when the noninverting input is at a lower
+    192            *         voltage than the inverting input.
+    193            * @note   Comparator output is high when the noninverting input is at a higher
+    194            *         voltage than the inverting input.
+    195            * @note   Comparators outputs aren't available on GPIO (outputs levels are 
+    196            *         only internal). The COMP1 and COMP2 outputs are connected internally 
+    197            *         to the EXTI Line 21 and Line 22 respectively.
+    198            * @param  COMP_Selection: the selected comparator.
+    199            *   This parameter can be one of the following values:
+    200            *     @arg COMP_Selection_COMP1: COMP1 selected
+    201            *     @arg COMP_Selection_COMP2: COMP2 selected
+    202            * @retval Returns the selected comparator output level.
+    203            */
+    204          uint8_t COMP_GetOutputLevel(uint32_t COMP_Selection)
+    205          {
+    206            uint8_t compout = 0x0;
+    207          
+    208            /* Check the parameters */
+    209            assert_param(IS_COMP_ALL_PERIPH(COMP_Selection));
+    210          
+    211            /* Check if Comparator 1 is selected */
+    212            if(COMP_Selection == COMP_Selection_COMP1)
+    213            {
+    214              /* Check if comparator 1 output level is high */
+    215              if((COMP->CSR & COMP_CSR_CMP1OUT) != (uint8_t) RESET)
+    216              {
+    217                /* Get Comparator 1 output level */
+    218                compout = (uint8_t) COMP_OutputLevel_High;
+    219              }
+    220              /* comparator 1 output level is low */
+    221              else
+    222              {
+    223                /* Get Comparator 1 output level */
+    224                compout = (uint8_t) COMP_OutputLevel_Low;
+    225              }
+    226            }
+    227            /* Comparator 2 is selected */
+    228            else
+    229            {
+    230              /* Check if comparator 2 output level is high */
+    231              if((COMP->CSR & COMP_CSR_CMP2OUT) != (uint8_t) RESET)
+    232              {
+    233                /* Get Comparator output level */
+    234                compout = (uint8_t) COMP_OutputLevel_High;
+    235              }
+    236              /* comparator 2 output level is low */
+    237              else
+    238              {
+    239                /* Get Comparator 2 output level */
+    240                compout = (uint8_t) COMP_OutputLevel_Low;
+    241              }
+    242            }
+    243            /* Return the comparator output level */
+    244            return (uint8_t)(compout);
+    245          }
+    246          
+    247          /**
+    248            * @brief  Close or Open the SW1 switch.
+    249            * @param  NewState: new state of the SW1 switch.
+    250            *         This parameter can be: ENABLE or DISABLE.
+    251            * @note   ENABLE to close the SW1 switch
+    252            * @note   DISABLE to open the SW1 switch
+    253            * @retval None.
+    254            */
+    255          void COMP_SW1SwitchConfig(FunctionalState NewState)
+    256          {
+    257            /* Check the parameters */
+    258            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    259          
+    260            if (NewState != DISABLE)
+    261            {
+    262              /* Close SW1 switch */
+    263              COMP->CSR |= (uint32_t) COMP_CSR_SW1;
+    264            }
+    265            else
+    266            {
+    267              /* Open SW1 switch */
+    268              COMP->CSR &= (uint32_t)(~COMP_CSR_SW1);
+    269            }
+    270          }
+    271          
+    272          /**
+    273            * @}
+    274            */
+    275          
+    276          /** @defgroup COMP_Group2 Window mode control function
+    277           *  @brief   Window mode control function.
+    278           *
+    279          @verbatim
+    280           ===============================================================================
+    281                            ##### Window mode control function #####
+    282           ===============================================================================
+    283          
+    284          @endverbatim
+    285            * @{
+    286            */
+    287          
+    288          /**
+    289            * @brief  Enables or disables the window mode.
+    290            *         In window mode:
+    291            * @note   COMP1 inverting input is fixed to VREFINT defining the first
+    292            *         threshold.
+    293            * @note   COMP2 inverting input is configurable (DAC_OUT1, DAC_OUT2, VREFINT
+    294            *         sub-multiples, PB3) defining the second threshold.
+    295            * @note   COMP1 and COMP2 non inverting inputs are connected together.
+    296            * @note   In window mode, only the Group 6 (PB4 or PB5) can be used as
+    297            *         noninverting inputs.
+    298            * @param   NewState: new state of the window mode. 
+    299            *   This parameter can be ENABLE or DISABLE.
+    300            * @retval None
+    301            */
+    302          void COMP_WindowCmd(FunctionalState NewState)
+    303          {
+    304            /* Check the parameters */
+    305            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    306            
+    307            if (NewState != DISABLE)
+    308            {
+    309              /* Enable the window mode */
+    310              COMP->CSR |= (uint32_t) COMP_CSR_WNDWE;
+    311            }
+    312            else
+    313            {
+    314              /* Disable the window mode */
+    315              COMP->CSR &= (uint32_t)(~COMP_CSR_WNDWE);
+    316            }
+    317          }
+    318          
+    319          /**
+    320            * @}
+    321            */
+    322          
+    323          /** @defgroup COMP_Group3 Internal Reference Voltage output function
+    324           *  @brief   Internal Reference Voltage (VREFINT) output function.
+    325           *
+    326          @verbatim
+    327           ===============================================================================
+    328                ##### Internal Reference Voltage (VREFINT) output function #####
+    329           ===============================================================================
+    330          
+    331          @endverbatim
+    332            * @{
+    333            */
+    334          
+    335          /**
+    336            * @brief  Enables or disables the output of internal reference voltage (VREFINT).
+    337            *         The VREFINT output can be routed to any I/O in group 3: CH8 (PB0) or
+    338            *         CH9 (PB1).
+    339            *         To correctly use this function, the SYSCFG_RIIOSwitchConfig() function
+    340            *         should be called after.
+    341            * @param  NewState: new state of the Vrefint output.
+    342            *         This parameter can be: ENABLE or DISABLE.
+    343            * @retval None
+    344            */
+    345          void COMP_VrefintOutputCmd(FunctionalState NewState)
+    346          {
+    347            /* Check the parameters */
+    348            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    349          
+    350            if (NewState != DISABLE)
+    351            {
+    352              /* Enable the output of internal reference voltage */
+    353              COMP->CSR |= (uint32_t) COMP_CSR_VREFOUTEN;
+    354            }
+    355            else
+    356            {
+    357              /* Disable the output of internal reference voltage */
+    358              COMP->CSR &= (uint32_t) (~COMP_CSR_VREFOUTEN);
+    359            }
+    360          }
+    361          
+    362          /**
+    363            * @}
+    364            */
+    365          
+    366          /**
+    367            * @}
+    368            */
+    369          
+    370          /**
+    371            * @}
+    372            */
+    373          
+    374          /**
+    375            * @}
+    376            */
+    377          
+    378          /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   COMP_Cmd
+       0   COMP_DeInit
+       0   COMP_GetOutputLevel
+       0   COMP_Init
+       0   COMP_SW1SwitchConfig
+       0   COMP_VrefintOutputCmd
+       0   COMP_WindowCmd
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable6
+       4  ??DataTable6_1
+      34  COMP_Cmd
+       8  COMP_DeInit
+      42  COMP_GetOutputLevel
+      28  COMP_Init
+      34  COMP_SW1SwitchConfig
+      34  COMP_VrefintOutputCmd
+      34  COMP_WindowCmd
+
+ 
+ 222 bytes in section .text
+ 
+ 222 bytes of CODE memory
+
+Errors: none
+Warnings: none

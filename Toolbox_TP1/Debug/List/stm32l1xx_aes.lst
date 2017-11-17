@@ -1,0 +1,703 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.30.3.8024/W32 for ARM        24/Nov/2014  11:34:23
+# Copyright 1999-2014 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_aes.c
+#    Command line =  
+#        "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_aes.c"
+#        -D USE_STDPERIPH_DRIVER -D STM32L1XX_XL -lcN "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\List\" -o "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\Obj\" --no_cse --no_unroll
+#        --no_inline --no_code_motion --no_tbaa --no_clustering --no_scheduling
+#        --debug --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0_2\arm\INC\c\DLib_Config_Normal.h" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Device\ST\STM32L1xx\Include\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\inc\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\"
+#        -I "D:\Mes Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Include\" -I
+#        "D:\Mes Documents\ST32\Toolbox_TP1\" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\" -Ol
+#    List file    =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\List\stm32l1xx_aes.lst
+#    Object file  =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\Obj\stm32l1xx_aes.o
+#
+###############################################################################
+
+D:\Mes Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_aes.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    stm32l1xx_aes.c
+      4            * @author  MCD Application Team
+      5            * @version V1.3.0
+      6            * @date    31-January-2014
+      7            * @brief   This file provides firmware functions to manage the following 
+      8            *          functionalities of the AES peripheral:           
+      9            *           + Configuration
+     10            *           + Read/Write operations
+     11            *           + DMA transfers management  
+     12            *           + Interrupts and flags management
+     13            * 
+     14            *  @verbatim
+     15           ===============================================================================
+     16                                  ##### AES Peripheral features #####
+     17           ===============================================================================
+     18          ....[..]
+     19             (#) The Advanced Encryption Standard hardware accelerator (AES) can be used
+     20                 to both encipher and decipher data using AES algorithm.
+     21             (#) The AES supports 4 operation modes:
+     22                 (++) Encryption: It consumes 214 clock cycle when processing one 128-bit block
+     23                 (++) Decryption: It consumes 214 clock cycle when processing one 128-bit block
+     24                 (++) Key derivation for decryption: It consumes 80 clock cycle when processing one 128-bit block
+     25                 (++) Key Derivation and decryption: It consumes 288 clock cycle when processing one 128-bit blobk
+     26             (#) Moreover 3 chaining modes are supported:
+     27                 (++) Electronic codebook (ECB): Each plain text is encrypted/decrypted separately
+     28                 (++) Cipher block chaining (CBC): Each block is XORed with the previous block
+     29                 (++) Counter mode (CTR): A 128-bit counter is encrypted and then XORed with the
+     30                    plain text to give the cipher text
+     31            (#) The AES peripheral supports data swapping: 1-bit, 8-bit, 16-bit and 32-bit.
+     32            (#) The AES peripheral supports write/read error handling with interrupt capability.
+     33            (#) Automatic data flow control with support of direct memory access (DMA) using
+     34                2 channels, one for incoming data (DMA2 Channel5), and one for outcoming data
+     35                (DMA2 Channel3).
+     36          
+     37                                ##### How to use this driver #####
+     38           ===============================================================================
+     39              [..]
+     40                  (#) AES AHB clock must be enabled to get write access to AES registers 
+     41                      using RCC_AHBPeriphClockCmd(RCC_AHBPeriph_AES, ENABLE).
+     42                  (#) Initialize the key using AES_KeyInit().
+     43                  (#) Configure the AES operation mode using AES_Init().
+     44                  (#) If required, enable interrupt source using AES_ITConfig() and
+     45                      enable the AES interrupt vector using NVIC_Init().
+     46                  (#) If required, when using the DMA mode.
+     47                      (##) Configure the DMA using DMA_Init().
+     48                      (##) Enable DMA requests using AES_DMAConfig().
+     49                  (#) Enable the AES peripheral using AES_Cmd().
+     50              @endverbatim
+     51            
+     52            ******************************************************************************
+     53            * @attention
+     54            *
+     55            * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+     56            *
+     57            * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+     58            * You may not use this file except in compliance with the License.
+     59            * You may obtain a copy of the License at:
+     60            *
+     61            *        http://www.st.com/software_license_agreement_liberty_v2
+     62            *
+     63            * Unless required by applicable law or agreed to in writing, software 
+     64            * distributed under the License is distributed on an "AS IS" BASIS, 
+     65            * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     66            * See the License for the specific language governing permissions and
+     67            * limitations under the License.
+     68            *
+     69            ******************************************************************************
+     70            */
+     71          
+     72          /* Includes ------------------------------------------------------------------*/
+     73          #include "stm32l1xx_aes.h"
+     74          #include "stm32l1xx_rcc.h"
+     75          
+     76          /** @addtogroup STM32L1xx_StdPeriph_Driver
+     77            * @{
+     78            */
+     79          
+     80          /** @defgroup AES 
+     81            * @brief AES driver modules
+     82            * @{
+     83            */ 
+     84          
+     85          /* Private typedef -----------------------------------------------------------*/
+     86          /* Private define ------------------------------------------------------------*/
+     87          #define CR_CLEAR_MASK  ((uint32_t)0xFFFFFF81)
+     88          
+     89          /* Private macro -------------------------------------------------------------*/
+     90          /* Private variables ---------------------------------------------------------*/
+     91          /* Private function prototypes -----------------------------------------------*/
+     92          /* Private functions ---------------------------------------------------------*/
+     93          
+     94          /** @defgroup AES_Private_Functions
+     95            * @{
+     96            */
+     97          
+     98          /** @defgroup AES_Group1 Initialization and configuration
+     99           *  @brief   Initialization and configuration.
+    100           *
+    101          @verbatim
+    102           ===============================================================================
+    103                          ##### Initialization and configuration #####
+    104           ===============================================================================
+    105          
+    106          @endverbatim
+    107            * @{
+    108            */  
+    109          
+    110            /**
+    111            * @brief  Deinitializes AES peripheral registers to their default reset values.
+    112            * @param  None
+    113            * @retval None
+    114            */
+    115          void AES_DeInit(void)
+    116          {
+    117            /* Enable AES reset state */
+    118            RCC_AHBPeriphResetCmd(RCC_AHBPeriph_AES, ENABLE);
+    119            /* Release AES from reset state */
+    120            RCC_AHBPeriphResetCmd(RCC_AHBPeriph_AES, DISABLE);
+    121          }
+    122          
+    123          /**
+    124            * @brief  Initializes the AES peripheral according to the specified parameters
+    125            *         in the AES_InitStruct:
+    126            *           - AES_Operation: specifies the operation mode (encryption, decryption...).
+    127            *           - AES_Chaining: specifies the chaining mode (ECB, CBC or CTR).
+    128            *           - AES_DataType: specifies the data swapping type: 32-bit, 16-bit, 8-bit or 1-bit.
+    129            * @note   If AES is already enabled, use AES_Cmd(DISABLE) before setting the new 
+    130            *         configuration (When AES is enabled, setting configuration is forbidden).
+    131            * @param  AES_InitStruct: pointer to an AES_InitTypeDef structure that contains 
+    132            *         the configuration information for AES peripheral.
+    133            * @retval None
+    134            */
+    135          void AES_Init(AES_InitTypeDef* AES_InitStruct)
+    136          {
+    137            uint32_t tmpreg = 0;
+    138            
+    139            /* Check the parameters */
+    140            assert_param(IS_AES_MODE(AES_InitStruct->AES_Operation));
+    141            assert_param(IS_AES_CHAINING(AES_InitStruct->AES_Chaining));
+    142            assert_param(IS_AES_DATATYPE(AES_InitStruct->AES_DataType));
+    143          
+    144            /* Get AES CR register value */
+    145            tmpreg = AES->CR;
+    146            
+    147            /* Clear DATATYPE[1:0], MODE[1:0] and CHMOD[1:0] bits */
+    148            tmpreg &= (uint32_t)CR_CLEAR_MASK;
+    149            
+    150            tmpreg |= (AES_InitStruct->AES_Operation | AES_InitStruct->AES_Chaining | AES_InitStruct->AES_DataType);
+    151          
+    152            AES->CR = (uint32_t) tmpreg;
+    153          }
+    154          
+    155          /**
+    156            * @brief  Initializes the AES Keys according to the specified parameters in the AES_KeyInitStruct.
+    157            * @param  AES_KeyInitStruct: pointer to an AES_KeyInitTypeDef structure that
+    158            *         contains the configuration information for the specified AES Keys.
+    159            * @note   This function must be called while the AES is disabled.
+    160            * @note   In encryption, key derivation and key derivation + decryption modes,
+    161            *         AES_KeyInitStruct must contain the encryption key.
+    162            *         In decryption mode, AES_KeyInitStruct must contain the decryption key.
+    163            * @retval None
+    164            */
+    165          void AES_KeyInit(AES_KeyInitTypeDef* AES_KeyInitStruct)
+    166          {
+    167            AES->KEYR0 = AES_KeyInitStruct->AES_Key0;
+    168            AES->KEYR1 = AES_KeyInitStruct->AES_Key1;
+    169            AES->KEYR2 = AES_KeyInitStruct->AES_Key2;
+    170            AES->KEYR3 = AES_KeyInitStruct->AES_Key3;
+    171          }
+    172          
+    173          /**
+    174            * @brief  Initializes the AES Initialization Vector IV according to 
+    175            *         the specified parameters in the AES_IVInitStruct.
+    176            * @param  AES_KeyInitStruct: pointer to an AES_IVInitTypeDef structure that
+    177            *         contains the configuration information for the specified AES IV.
+    178            * @note   When ECB chaining mode is selected, Initialization Vector IV has no
+    179            *         meaning.
+    180            *         When CTR chaining mode is selected, AES_IV0 contains the CTR value.
+    181            *         AES_IV1, AES_IV2 and AES_IV3 contains nonce value.
+    182            * @retval None
+    183            */
+    184          void AES_IVInit(AES_IVInitTypeDef* AES_IVInitStruct)
+    185          {
+    186            AES->IVR0 = AES_IVInitStruct->AES_IV0;
+    187            AES->IVR1 = AES_IVInitStruct->AES_IV1;
+    188            AES->IVR2 = AES_IVInitStruct->AES_IV2;
+    189            AES->IVR3 = AES_IVInitStruct->AES_IV3;
+    190          }
+    191          
+    192          /**
+    193            * @brief  Enable or disable the AES peripheral.
+    194            * @param  NewState: new state of the AES peripheral.
+    195            *         This parameter can be: ENABLE or DISABLE.
+    196            * @note   The key must be written while AES is disabled.
+    197            * @retval None
+    198            */
+    199          void AES_Cmd(FunctionalState NewState)
+    200          {
+    201            /* Check the parameter */
+    202            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    203          
+    204            if (NewState != DISABLE)
+    205            {
+    206              /* Enable the AES peripheral */
+    207              AES->CR |= (uint32_t) AES_CR_EN;   /**< AES Enable */
+    208            }
+    209            else
+    210            {
+    211              /* Disable the AES peripheral */
+    212              AES->CR &= (uint32_t)(~AES_CR_EN);  /**< AES Disable */
+    213            }
+    214          }
+    215          
+    216          /**
+    217            * @}
+    218            */
+    219          
+    220          /** @defgroup AES_Group2 Structures initialization functions
+    221           *  @brief   Structures initialization.
+    222           *
+    223          @verbatim
+    224           ===============================================================================
+    225                        ##### Structures initialization functions #####
+    226           ===============================================================================
+    227          
+    228          @endverbatim
+    229            * @{
+    230            */
+    231          
+    232          /**
+    233            * @brief  Fills each AES_InitStruct member with its default value.
+    234            * @param  AES_InitStruct: pointer to an AES_InitTypeDef structure which will 
+    235            *         be initialized.
+    236            * @retval None
+    237            */
+    238          void AES_StructInit(AES_InitTypeDef* AES_InitStruct)
+    239          {
+    240            AES_InitStruct->AES_Operation = AES_Operation_Encryp;
+    241            AES_InitStruct->AES_Chaining = AES_Chaining_ECB;
+    242            AES_InitStruct->AES_DataType = AES_DataType_32b;
+    243          }
+    244          
+    245          /**
+    246            * @brief  Fills each AES_KeyInitStruct member with its default value.
+    247            * @param  AES_KeyInitStruct: pointer to an AES_KeyInitStruct structure which 
+    248            *         will be initialized.
+    249            * @retval None
+    250            */
+    251          void AES_KeyStructInit(AES_KeyInitTypeDef* AES_KeyInitStruct)
+    252          {
+    253            AES_KeyInitStruct->AES_Key0 = 0x00000000;
+    254            AES_KeyInitStruct->AES_Key1 = 0x00000000;
+    255            AES_KeyInitStruct->AES_Key2 = 0x00000000;
+    256            AES_KeyInitStruct->AES_Key3 = 0x00000000;
+    257          }
+    258          
+    259          /**
+    260            * @brief  Fills each AES_IVInitStruct member with its default value.
+    261            * @param  AES_IVInitStruct: pointer to an AES_IVInitTypeDef structure which
+    262            *         will be initialized.
+    263            * @retval None
+    264            */
+    265          void AES_IVStructInit(AES_IVInitTypeDef* AES_IVInitStruct)
+    266          {
+    267            AES_IVInitStruct->AES_IV0 = 0x00000000;
+    268            AES_IVInitStruct->AES_IV1 = 0x00000000;
+    269            AES_IVInitStruct->AES_IV2 = 0x00000000;
+    270            AES_IVInitStruct->AES_IV3 = 0x00000000;
+    271          }
+    272          
+    273          /**
+    274            * @}
+    275            */
+    276          
+    277          /** @defgroup AES_Group3 AES Read and Write
+    278           *  @brief   AES Read and Write.
+    279           *
+    280          @verbatim
+    281           ===============================================================================
+    282                            ##### AES Read and Write functions #####
+    283           ===============================================================================
+    284          
+    285          @endverbatim
+    286            * @{
+    287            */
+    288          
+    289          /**
+    290            * @brief  Write data in DINR register to be processed by AES peripheral.
+    291            * @note   To process 128-bit data (4 * 32-bit), this function must be called
+    292            *         four times to write the 128-bit data in the 32-bit register DINR.
+    293            * @note   When an unexpected write to DOUTR register is detected, WRERR flag is
+    294            *         set.
+    295            * @param  Data: The data to be processed.
+    296            * @retval None
+    297            */
+    298          void AES_WriteSubData(uint32_t Data)
+    299          {
+    300            /* Write Data */
+    301            AES->DINR = Data;
+    302          }
+    303          
+    304          /**
+    305            * @brief  Returns the data in DOUTR register processed by AES peripheral.
+    306            * @note   This function must be called four times to get the 128-bit data.
+    307            * @note   When an unexpected read of DINR register is detected, RDERR flag is
+    308            *         set.
+    309            * @retval The processed data.
+    310            */
+    311          uint32_t AES_ReadSubData(void)
+    312          {
+    313            /* Read Data */
+    314            return AES->DOUTR;
+    315          }
+    316          
+    317          /**
+    318            * @brief  Read the Key value.
+    319            * @param  AES_KeyInitStruct: pointer to an AES_KeyInitTypeDef structure which
+    320            *         will contain the key.
+    321            * @note   When the key derivation mode is selected, AES must be disabled
+    322            *         (AES_Cmd(DISABLE)) before reading the decryption key.
+    323            *         Reading the key while the AES is enabled will return unpredictable
+    324            *         value.
+    325            * @retval None
+    326            */
+    327          void AES_ReadKey(AES_KeyInitTypeDef* AES_KeyInitStruct)
+    328          {
+    329            AES_KeyInitStruct->AES_Key0 = AES->KEYR0;
+    330            AES_KeyInitStruct->AES_Key1 = AES->KEYR1;
+    331            AES_KeyInitStruct->AES_Key2 = AES->KEYR2;
+    332            AES_KeyInitStruct->AES_Key3 = AES->KEYR3;
+    333          }
+    334          
+    335          /**
+    336            * @brief  Read the Initialization Vector IV value.
+    337            * @param  AES_IVInitStruct: pointer to an AES_IVInitTypeDef structure which
+    338            *         will contain the Initialization Vector IV.
+    339            * @note   When the AES is enabled Reading the Initialization Vector IV value
+    340            *         will return 0. The AES must be disabled using AES_Cmd(DISABLE)
+    341            *         to get the right value.
+    342            * @note   When ECB chaining mode is selected, Initialization Vector IV has no
+    343            *         meaning.
+    344            *         When CTR chaining mode is selected, AES_IV0 contains 32-bit Counter value.
+    345            *         AES_IV1, AES_IV2 and AES_IV3 contains nonce value.
+    346            * @retval None
+    347            */
+    348          void AES_ReadIV(AES_IVInitTypeDef* AES_IVInitStruct)
+    349          {
+    350            AES_IVInitStruct->AES_IV0 = AES->IVR0;
+    351            AES_IVInitStruct->AES_IV1 = AES->IVR1;
+    352            AES_IVInitStruct->AES_IV2 = AES->IVR2;
+    353            AES_IVInitStruct->AES_IV3 = AES->IVR3;
+    354          }
+    355          
+    356          /**
+    357            * @}
+    358            */
+    359          
+    360          /** @defgroup AES_Group4 DMA transfers management functions
+    361           *  @brief   DMA transfers management function.
+    362           *
+    363          @verbatim
+    364           ===============================================================================
+    365                         ##### DMA transfers management functions #####
+    366           ===============================================================================
+    367          
+    368          @endverbatim
+    369            * @{
+    370            */
+    371          
+    372          /**
+    373            * @brief  Configures the AES DMA interface.
+    374            * @param  AES_DMATransfer: Specifies the AES DMA transfer.
+    375            *   This parameter can be one of the following values:
+    376            *     @arg AES_DMATransfer_In: When selected, DMA manages the data input phase.
+    377            *     @arg AES_DMATransfer_Out: When selected, DMA manages the data output phase.
+    378            *     @arg AES_DMATransfer_InOut: When selected, DMA manages both the data input/output phases.
+    379            * @param  NewState Indicates the new state of the AES DMA interface.
+    380            *           This parameter can be: ENABLE or DISABLE.
+    381            * @note   The DMA has no action in key derivation mode.
+    382            * @retval None
+    383            */
+    384          void AES_DMAConfig(uint32_t AES_DMATransfer, FunctionalState NewState)
+    385          {
+    386            /* Check the parameter */
+    387            assert_param(IS_AES_DMA_TRANSFER(AES_DMATransfer));
+    388          
+    389            if (NewState != DISABLE)
+    390            {
+    391              /* Enable the DMA transfer */
+    392              AES->CR |= (uint32_t) AES_DMATransfer;
+    393            }
+    394            else
+    395            {
+    396              /* Disable the DMA transfer */
+    397              AES->CR &= (uint32_t)(~AES_DMATransfer);
+    398            }
+    399          }
+    400          
+    401          /**
+    402            * @}
+    403            */
+    404          
+    405          /** @defgroup AES_Group5 Interrupts and flags management functions
+    406           *  @brief   Interrupts and flags management functions.
+    407           *
+    408          @verbatim
+    409          
+    410           ===============================================================================
+    411                     ##### Interrupts and flags management functions #####
+    412           ===============================================================================
+    413          @endverbatim
+    414            * @{
+    415            */
+    416          
+    417          /**
+    418            * @brief  Enables or disables the specified AES interrupt.
+    419            * @param  AES_IT: Specifies the AES interrupt source to enable/disable.
+    420            *     This parameter can be any combinations of the following values:
+    421            *     @arg AES_IT_CC: Computation Complete Interrupt. If enabled, once CCF 
+    422            *                     flag is set an interrupt is generated.
+    423            *     @arg AES_IT_ERR: Error Interrupt. If enabled, once a read error
+    424            *                      flags (RDERR) or write error flag (WRERR) is set,
+    425            *                      an interrupt is generated.
+    426            * @param  NewState: The new state of the AES interrupt source.
+    427            *                   This parameter can be: ENABLE or DISABLE.
+    428            * @retval None
+    429            */
+    430          void AES_ITConfig(uint32_t AES_IT, FunctionalState NewState)
+    431          {
+    432            /* Check the parameters */
+    433            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    434            assert_param(IS_AES_IT(AES_IT));
+    435          
+    436            if (NewState != DISABLE)
+    437            {
+    438              AES->CR |= (uint32_t) AES_IT;    /**< AES_IT Enable */
+    439            }
+    440            else
+    441            {
+    442              AES->CR &= (uint32_t)(~AES_IT);  /**< AES_IT Disable */
+    443            }
+    444          }
+    445          
+    446          /**
+    447            * @brief  Checks whether the specified AES flag is set or not.
+    448            * @param  AES_FLAG specifies the flag to check.
+    449            *   This parameter can be one of the following values:
+    450            *     @arg AES_FLAG_CCF: Computation Complete Flag is set by hardware when
+    451            *                        he computation phase is completed.
+    452            *     @arg AES_FLAG_RDERR: Read Error Flag is set when an unexpected read
+    453            *                          operation of DOUTR register is detected.
+    454            *     @arg AES_FLAG_WRERR: Write Error Flag  is set when an unexpected write
+    455            *                          operation in DINR is detected.
+    456            * @retval FlagStatus (SET or RESET)
+    457            */
+    458          FlagStatus AES_GetFlagStatus(uint32_t AES_FLAG)
+    459          {
+    460            FlagStatus bitstatus = RESET;
+    461          
+    462            /* Check parameters */
+    463            assert_param(IS_AES_FLAG(AES_FLAG));
+    464          
+    465            if ((AES->SR & AES_FLAG) != (uint32_t)RESET)
+    466            {
+    467              bitstatus = SET;
+    468            }
+    469            else
+    470            {
+    471              bitstatus = RESET;
+    472            }
+    473              
+    474            /* Return the AES_FLAG status */
+    475            return  bitstatus;
+    476          }
+    477          
+    478          /**
+    479            * @brief  Clears the AES flags.
+    480            * @param  AES_FLAG: specifies the flag to clear.
+    481            *         This parameter can be:
+    482            *     @arg AES_FLAG_CCF: Computation Complete Flag is cleared by setting CCFC
+    483            *                        bit in CR register.
+    484            *     @arg AES_FLAG_RDERR: Read Error is cleared by setting ERRC bit in 
+    485            *                          CR register.
+    486            *     @arg AES_FLAG_WRERR: Write Error is cleared by setting ERRC bit in
+    487            *                          CR register.
+    488            * @retval None
+    489            */
+    490          void AES_ClearFlag(uint32_t AES_FLAG)
+    491          {
+    492            /* Check the parameters */
+    493            assert_param(IS_AES_FLAG(AES_FLAG));
+    494          
+    495            /* Check if AES_FLAG is AES_FLAG_CCF */
+    496            if (AES_FLAG == AES_FLAG_CCF)
+    497            {
+    498              /* Clear CCF flag by setting CCFC bit */
+    499              AES->CR |= (uint32_t) AES_CR_CCFC;
+    500            }
+    501            else /* AES_FLAG is AES_FLAG_RDERR or AES_FLAG_WRERR */
+    502            {
+    503              /* Clear RDERR and WRERR flags by setting ERRC bit */
+    504              AES->CR |= (uint32_t) AES_CR_ERRC;
+    505            }
+    506          }
+    507          
+    508          /**
+    509            * @brief  Checks whether the specified AES interrupt has occurred or not.
+    510            * @param  AES_IT: Specifies the AES interrupt pending bit to check.
+    511            *         This parameter can be:
+    512            *     @arg AES_IT_CC: Computation Complete Interrupt.
+    513            *     @arg AES_IT_ERR: Error Interrupt.
+    514            * @retval ITStatus The new state of AES_IT (SET or RESET).
+    515            */
+    516          ITStatus AES_GetITStatus(uint32_t AES_IT)
+    517          {
+    518            ITStatus itstatus = RESET;
+    519            uint32_t cciebitstatus = RESET, ccfbitstatus = RESET;
+    520          
+    521            /* Check parameters */
+    522            assert_param(IS_AES_GET_IT(AES_IT));
+    523          
+    524            cciebitstatus = AES->CR & AES_CR_CCIE;
+    525            ccfbitstatus =  AES->SR & AES_SR_CCF;
+    526          
+    527            /* Check if AES_IT is AES_IT_CC */
+    528            if (AES_IT == AES_IT_CC)
+    529            {
+    530              /* Check the status of the specified AES interrupt */
+    531              if (((cciebitstatus) != (uint32_t)RESET) && ((ccfbitstatus) != (uint32_t)RESET))
+    532              {
+    533                /* Interrupt occurred */
+    534                itstatus = SET;
+    535              }
+    536              else
+    537              {
+    538                /* Interrupt didn't occur */
+    539                itstatus = RESET;
+    540              }
+    541            }
+    542            else /* AES_IT is AES_IT_ERR */
+    543            {
+    544              /* Check the status of the specified AES interrupt */
+    545              if ((AES->CR & AES_CR_ERRIE) != RESET)
+    546              {
+    547                /* Check if WRERR or RDERR flags are set */
+    548                if ((AES->SR & (uint32_t)(AES_SR_WRERR | AES_SR_RDERR)) != (uint16_t)RESET)
+    549                {
+    550                  /* Interrupt occurred */
+    551                  itstatus = SET;
+    552                }
+    553                else
+    554                {
+    555                  /* Interrupt didn't occur */
+    556                  itstatus = RESET;
+    557                }
+    558              }
+    559              else
+    560              {
+    561                /* Interrupt didn't occur */
+    562                itstatus = (ITStatus) RESET;
+    563              }
+    564            }
+    565          
+    566            /* Return the AES_IT status */
+    567            return itstatus;
+    568          }
+    569          
+    570          /**
+    571            * @brief  Clears the AES's interrupt pending bits.
+    572            * @param  AES_IT: specifies the interrupt pending bit to clear.
+    573            *   This parameter can be any combinations of the following values:
+    574            *     @arg AES_IT_CC: Computation Complete Interrupt.
+    575            *     @arg AES_IT_ERR: Error Interrupt.
+    576            * @retval None
+    577            */
+    578          void AES_ClearITPendingBit(uint32_t AES_IT)
+    579          {
+    580            /* Check the parameters */
+    581            assert_param(IS_AES_IT(AES_IT));
+    582          
+    583            /* Clear the interrupt pending bit */
+    584            AES->CR |= (uint32_t) (AES_IT >> (uint32_t) 0x00000002);
+    585          }
+    586          
+    587          /**
+    588            * @}
+    589            */
+    590          
+    591          /**
+    592            * @}
+    593            */
+    594          
+    595          /**
+    596            * @}
+    597            */
+    598          
+    599          /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   AES_ClearFlag
+       0   AES_ClearITPendingBit
+       0   AES_Cmd
+       0   AES_DMAConfig
+       8   AES_DeInit
+         8   -> RCC_AHBPeriphResetCmd
+       0   AES_GetFlagStatus
+       0   AES_GetITStatus
+       0   AES_ITConfig
+       0   AES_IVInit
+       0   AES_IVStructInit
+       0   AES_Init
+       0   AES_KeyInit
+       0   AES_KeyStructInit
+       0   AES_ReadIV
+       0   AES_ReadKey
+       0   AES_ReadSubData
+       0   AES_StructInit
+       0   AES_WriteSubData
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable13
+       4  ??DataTable13_1
+       4  ??DataTable13_10
+       4  ??DataTable13_11
+       4  ??DataTable13_2
+       4  ??DataTable13_3
+       4  ??DataTable13_4
+       4  ??DataTable13_5
+       4  ??DataTable13_6
+       4  ??DataTable13_7
+       4  ??DataTable13_8
+       4  ??DataTable13_9
+      32  AES_ClearFlag
+      14  AES_ClearITPendingBit
+      34  AES_Cmd
+      32  AES_DMAConfig
+      24  AES_DeInit
+      22  AES_GetFlagStatus
+      78  AES_GetITStatus
+      32  AES_ITConfig
+      26  AES_IVInit
+      18  AES_IVStructInit
+      28  AES_Init
+      26  AES_KeyInit
+      18  AES_KeyStructInit
+      26  AES_ReadIV
+      26  AES_ReadKey
+       6  AES_ReadSubData
+      14  AES_StructInit
+       6  AES_WriteSubData
+
+ 
+ 510 bytes in section .text
+ 
+ 510 bytes of CODE memory
+
+Errors: none
+Warnings: none

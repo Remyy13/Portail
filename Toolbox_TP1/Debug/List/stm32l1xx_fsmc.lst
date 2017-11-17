@@ -1,0 +1,349 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.30.3.8024/W32 for ARM        24/Nov/2014  11:34:25
+# Copyright 1999-2014 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_fsmc.c
+#    Command line =  
+#        "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_fsmc.c"
+#        -D USE_STDPERIPH_DRIVER -D STM32L1XX_XL -lcN "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\List\" -o "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\Obj\" --no_cse --no_unroll
+#        --no_inline --no_code_motion --no_tbaa --no_clustering --no_scheduling
+#        --debug --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0_2\arm\INC\c\DLib_Config_Normal.h" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Device\ST\STM32L1xx\Include\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\inc\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\"
+#        -I "D:\Mes Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Include\" -I
+#        "D:\Mes Documents\ST32\Toolbox_TP1\" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\" -Ol
+#    List file    =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\List\stm32l1xx_fsmc.lst
+#    Object file  =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\Obj\stm32l1xx_fsmc.o
+#
+###############################################################################
+
+D:\Mes Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_fsmc.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    stm32l1xx_fsmc.c
+      4            * @author  MCD Application Team
+      5            * @version V1.3.0
+      6            * @date    31-January-2014
+      7            * @brief   This file provides firmware functions to manage the following 
+      8            *          functionalities of the FSMC peripheral:
+      9            *           + Initialization 
+     10            *           + Interrupts and flags management
+     11            *
+     12            ******************************************************************************
+     13            * @attention
+     14            *
+     15            * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+     16            *
+     17            * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+     18            * You may not use this file except in compliance with the License.
+     19            * You may obtain a copy of the License at:
+     20            *
+     21            *        http://www.st.com/software_license_agreement_liberty_v2
+     22            *
+     23            * Unless required by applicable law or agreed to in writing, software 
+     24            * distributed under the License is distributed on an "AS IS" BASIS, 
+     25            * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     26            * See the License for the specific language governing permissions and
+     27            * limitations under the License.
+     28            *
+     29            ******************************************************************************
+     30            */
+     31          
+     32          /* Includes ------------------------------------------------------------------*/
+     33          #include "stm32l1xx_fsmc.h"
+     34          #include "stm32l1xx_rcc.h"
+     35          
+     36          /** @addtogroup STM32L1xx_StdPeriph_Driver
+     37            * @{
+     38            */
+     39          
+     40          /** @defgroup FSMC 
+     41            * @brief FSMC driver modules
+     42            * @{
+     43            */ 
+     44          
+     45          /* Private typedef -----------------------------------------------------------*/
+     46          /* Private define ------------------------------------------------------------*/
+     47          /* Private macro -------------------------------------------------------------*/
+     48          /* Private variables ---------------------------------------------------------*/
+     49          /* Private function prototypes -----------------------------------------------*/
+     50          /* Private functions ---------------------------------------------------------*/
+     51          
+     52          /** @defgroup FSMC_Private_Functions
+     53            * @{
+     54            */
+     55          
+     56          /** @defgroup FSMC_Group1 NOR/SRAM Controller functions
+     57           *  @brief   NOR/SRAM Controller functions 
+     58           *
+     59            @verbatim
+     60            ==============================================================================
+     61                            ##### NOR-SRAM Controller functions #####
+     62            ==============================================================================
+     63              [..] The following sequence should be followed to configure the FSMC to 
+     64                   interface with SRAM, PSRAM, NOR or OneNAND memory connected to the 
+     65                   NOR/SRAM Bank: 
+     66              (#) Enable the clock for the FSMC and associated GPIOs using the following 
+     67                  functions: 
+     68                  (++)RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE); 
+     69                  (++)RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOx, ENABLE); 
+     70              (#) FSMC pins configuration  
+     71                  (++) Connect the involved FSMC pins to AF12 using the following function  
+     72                       GPIO_PinAFConfig(GPIOx, GPIO_PinSourcex, GPIO_AF_FSMC);
+     73                  (++) Configure these FSMC pins in alternate function mode by calling the
+     74                       function GPIO_Init();
+     75              (#) Declare a FSMC_NORSRAMInitTypeDef structure, for example: 
+     76                  FSMC_NORSRAMInitTypeDef  FSMC_NORSRAMInitStructure; and fill the 
+     77                  FSMC_NORSRAMInitStructure variable with the allowed values of the 
+     78                  structure member.
+     79              (#) Initialize the NOR/SRAM Controller by calling the function 
+     80                  FSMC_NORSRAMInit(&FSMC_NORSRAMInitStructure);  
+     81              (#) Then enable the NOR/SRAM Bank, for example: 
+     82                  FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM2, ENABLE);   
+     83              (#) At this stage you can read/write from/to the memory connected to the 
+     84                  NOR/SRAM Bank.
+     85             
+     86          @endverbatim
+     87          
+     88            * @{
+     89            */
+     90          
+     91          /**
+     92            * @brief  Deinitializes the FSMC NOR/SRAM Banks registers to their default 
+     93            *   reset values.
+     94            * @param  FSMC_Bank: specifies the FSMC Bank to be used
+     95            *   This parameter can be one of the following values:
+     96            *     @arg FSMC_Bank1_NORSRAM1: FSMC Bank1 NOR/SRAM1  
+     97            *     @arg FSMC_Bank1_NORSRAM2: FSMC Bank1 NOR/SRAM2 
+     98            *     @arg FSMC_Bank1_NORSRAM3: FSMC Bank1 NOR/SRAM3 
+     99            *     @arg FSMC_Bank1_NORSRAM4: FSMC Bank1 NOR/SRAM4 
+    100            * @retval None
+    101            */
+    102          void FSMC_NORSRAMDeInit(uint32_t FSMC_Bank)
+    103          {
+    104            /* Check the parameter */
+    105            assert_param(IS_FSMC_NORSRAM_BANK(FSMC_Bank));
+    106            
+    107            /* FSMC_Bank1_NORSRAM1 */
+    108            if(FSMC_Bank == FSMC_Bank1_NORSRAM1)
+    109            {
+    110              FSMC_Bank1->BTCR[FSMC_Bank] = 0x000030DB;    
+    111            }
+    112            /* FSMC_Bank1_NORSRAM2,  FSMC_Bank1_NORSRAM3 or FSMC_Bank1_NORSRAM4 */
+    113            else
+    114            {   
+    115              FSMC_Bank1->BTCR[FSMC_Bank] = 0x000030D2; 
+    116            }
+    117            FSMC_Bank1->BTCR[FSMC_Bank + 1] = 0x0FFFFFFF;
+    118            FSMC_Bank1E->BWTR[FSMC_Bank] = 0x0FFFFFFF;  
+    119          }
+    120          
+    121          /**
+    122            * @brief  Initializes the FSMC NOR/SRAM Banks according to the specified
+    123            *   parameters in the FSMC_NORSRAMInitStruct.
+    124            * @param  FSMC_NORSRAMInitStruct : pointer to a FSMC_NORSRAMInitTypeDef
+    125            *   structure that contains the configuration information for 
+    126            *   the FSMC NOR/SRAM specified Banks.                       
+    127            * @retval None
+    128            */
+    129          void FSMC_NORSRAMInit(FSMC_NORSRAMInitTypeDef* FSMC_NORSRAMInitStruct)
+    130          { 
+    131            /* Check the parameters */
+    132            assert_param(IS_FSMC_NORSRAM_BANK(FSMC_NORSRAMInitStruct->FSMC_Bank));
+    133            assert_param(IS_FSMC_MUX(FSMC_NORSRAMInitStruct->FSMC_DataAddressMux));
+    134            assert_param(IS_FSMC_MEMORY(FSMC_NORSRAMInitStruct->FSMC_MemoryType));
+    135            assert_param(IS_FSMC_MEMORY_WIDTH(FSMC_NORSRAMInitStruct->FSMC_MemoryDataWidth));
+    136            assert_param(IS_FSMC_BURSTMODE(FSMC_NORSRAMInitStruct->FSMC_BurstAccessMode));
+    137            assert_param(IS_FSMC_ASYNWAIT(FSMC_NORSRAMInitStruct->FSMC_AsynchronousWait));
+    138            assert_param(IS_FSMC_WAIT_POLARITY(FSMC_NORSRAMInitStruct->FSMC_WaitSignalPolarity));
+    139            assert_param(IS_FSMC_WRAP_MODE(FSMC_NORSRAMInitStruct->FSMC_WrapMode));
+    140            assert_param(IS_FSMC_WAIT_SIGNAL_ACTIVE(FSMC_NORSRAMInitStruct->FSMC_WaitSignalActive));
+    141            assert_param(IS_FSMC_WRITE_OPERATION(FSMC_NORSRAMInitStruct->FSMC_WriteOperation));
+    142            assert_param(IS_FSMC_WAITE_SIGNAL(FSMC_NORSRAMInitStruct->FSMC_WaitSignal));
+    143            assert_param(IS_FSMC_EXTENDED_MODE(FSMC_NORSRAMInitStruct->FSMC_ExtendedMode));
+    144            assert_param(IS_FSMC_WRITE_BURST(FSMC_NORSRAMInitStruct->FSMC_WriteBurst));  
+    145            assert_param(IS_FSMC_ADDRESS_SETUP_TIME(FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_AddressSetupTime));
+    146            assert_param(IS_FSMC_ADDRESS_HOLD_TIME(FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_AddressHoldTime));
+    147            assert_param(IS_FSMC_DATASETUP_TIME(FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_DataSetupTime));
+    148            assert_param(IS_FSMC_TURNAROUND_TIME(FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_BusTurnAroundDuration));
+    149            assert_param(IS_FSMC_CLK_DIV(FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_CLKDivision));
+    150            assert_param(IS_FSMC_DATA_LATENCY(FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_DataLatency));
+    151            assert_param(IS_FSMC_ACCESS_MODE(FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_AccessMode)); 
+    152            
+    153            /* Bank1 NOR/SRAM control register configuration */ 
+    154            FSMC_Bank1->BTCR[FSMC_NORSRAMInitStruct->FSMC_Bank] = 
+    155                      (uint32_t)FSMC_NORSRAMInitStruct->FSMC_DataAddressMux |
+    156                      FSMC_NORSRAMInitStruct->FSMC_MemoryType |
+    157                      FSMC_NORSRAMInitStruct->FSMC_MemoryDataWidth |
+    158                      FSMC_NORSRAMInitStruct->FSMC_BurstAccessMode |
+    159                      FSMC_NORSRAMInitStruct->FSMC_AsynchronousWait |
+    160                      FSMC_NORSRAMInitStruct->FSMC_WaitSignalPolarity |
+    161                      FSMC_NORSRAMInitStruct->FSMC_WrapMode |
+    162                      FSMC_NORSRAMInitStruct->FSMC_WaitSignalActive |
+    163                      FSMC_NORSRAMInitStruct->FSMC_WriteOperation |
+    164                      FSMC_NORSRAMInitStruct->FSMC_WaitSignal |
+    165                      FSMC_NORSRAMInitStruct->FSMC_ExtendedMode |
+    166                      FSMC_NORSRAMInitStruct->FSMC_WriteBurst;
+    167          
+    168            if(FSMC_NORSRAMInitStruct->FSMC_MemoryType == FSMC_MemoryType_NOR)
+    169            {
+    170              FSMC_Bank1->BTCR[FSMC_NORSRAMInitStruct->FSMC_Bank] |= (uint32_t)FSMC_BCR1_FACCEN;
+    171            }
+    172            
+    173            /* Bank1 NOR/SRAM timing register configuration */
+    174            FSMC_Bank1->BTCR[FSMC_NORSRAMInitStruct->FSMC_Bank+1] = 
+    175                      (uint32_t)FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_AddressSetupTime |
+    176                      (FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_AddressHoldTime << 4) |
+    177                      (FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_DataSetupTime << 8) |
+    178                      (FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_BusTurnAroundDuration << 16) |
+    179                      (FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_CLKDivision << 20) |
+    180                      (FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_DataLatency << 24) |
+    181                       FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_AccessMode;
+    182                      
+    183              
+    184            /* Bank1 NOR/SRAM timing register for write configuration, if extended mode is used */
+    185            if(FSMC_NORSRAMInitStruct->FSMC_ExtendedMode == FSMC_ExtendedMode_Enable)
+    186            {
+    187              assert_param(IS_FSMC_ADDRESS_SETUP_TIME(FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_AddressSetupTime));
+    188              assert_param(IS_FSMC_ADDRESS_HOLD_TIME(FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_AddressHoldTime));
+    189              assert_param(IS_FSMC_DATASETUP_TIME(FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_DataSetupTime));
+    190              assert_param(IS_FSMC_CLK_DIV(FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_CLKDivision));
+    191              assert_param(IS_FSMC_DATA_LATENCY(FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_DataLatency));
+    192              assert_param(IS_FSMC_ACCESS_MODE(FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_AccessMode));
+    193              FSMC_Bank1E->BWTR[FSMC_NORSRAMInitStruct->FSMC_Bank] = 
+    194                        (uint32_t)FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_AddressSetupTime |
+    195                        (FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_AddressHoldTime << 4 )|
+    196                        (FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_DataSetupTime << 8) |
+    197                        (FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_CLKDivision << 20) |
+    198                        (FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_DataLatency << 24) |
+    199                         FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_AccessMode;
+    200            }
+    201            else
+    202            {
+    203              FSMC_Bank1E->BWTR[FSMC_NORSRAMInitStruct->FSMC_Bank] = 0x0FFFFFFF;
+    204            }
+    205          }
+    206          
+    207          /**
+    208            * @brief  Fills each FSMC_NORSRAMInitStruct member with its default value.
+    209            * @param  FSMC_NORSRAMInitStruct: pointer to a FSMC_NORSRAMInitTypeDef 
+    210            *   structure which will be initialized.
+    211            * @retval None
+    212            */
+    213          void FSMC_NORSRAMStructInit(FSMC_NORSRAMInitTypeDef* FSMC_NORSRAMInitStruct)
+    214          {  
+    215            /* Reset NOR/SRAM Init structure parameters values */
+    216            FSMC_NORSRAMInitStruct->FSMC_Bank = FSMC_Bank1_NORSRAM1;
+    217            FSMC_NORSRAMInitStruct->FSMC_DataAddressMux = FSMC_DataAddressMux_Enable;
+    218            FSMC_NORSRAMInitStruct->FSMC_MemoryType = FSMC_MemoryType_SRAM;
+    219            FSMC_NORSRAMInitStruct->FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_8b;
+    220            FSMC_NORSRAMInitStruct->FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
+    221            FSMC_NORSRAMInitStruct->FSMC_AsynchronousWait = FSMC_AsynchronousWait_Disable;
+    222            FSMC_NORSRAMInitStruct->FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
+    223            FSMC_NORSRAMInitStruct->FSMC_WrapMode = FSMC_WrapMode_Disable;
+    224            FSMC_NORSRAMInitStruct->FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
+    225            FSMC_NORSRAMInitStruct->FSMC_WriteOperation = FSMC_WriteOperation_Enable;
+    226            FSMC_NORSRAMInitStruct->FSMC_WaitSignal = FSMC_WaitSignal_Enable;
+    227            FSMC_NORSRAMInitStruct->FSMC_ExtendedMode = FSMC_ExtendedMode_Disable;
+    228            FSMC_NORSRAMInitStruct->FSMC_WriteBurst = FSMC_WriteBurst_Disable;
+    229            FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_AddressSetupTime = 0xF;
+    230            FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_AddressHoldTime = 0xF;
+    231            FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_DataSetupTime = 0xFF;
+    232            FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_BusTurnAroundDuration = 0xF;
+    233            FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_CLKDivision = 0xF;
+    234            FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_DataLatency = 0xF;
+    235            FSMC_NORSRAMInitStruct->FSMC_ReadWriteTimingStruct->FSMC_AccessMode = FSMC_AccessMode_A; 
+    236            FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_AddressSetupTime = 0xF;
+    237            FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_AddressHoldTime = 0xF;
+    238            FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_DataSetupTime = 0xFF;
+    239            FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_BusTurnAroundDuration = 0xF;
+    240            FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_CLKDivision = 0xF;
+    241            FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_DataLatency = 0xF;
+    242            FSMC_NORSRAMInitStruct->FSMC_WriteTimingStruct->FSMC_AccessMode = FSMC_AccessMode_A;
+    243          }
+    244          
+    245          /**
+    246            * @brief  Enables or disables the specified NOR/SRAM Memory Bank.
+    247            * @param  FSMC_Bank: specifies the FSMC Bank to be used
+    248            *   This parameter can be one of the following values:
+    249            *     @arg FSMC_Bank1_NORSRAM1: FSMC Bank1 NOR/SRAM1  
+    250            *     @arg FSMC_Bank1_NORSRAM2: FSMC Bank1 NOR/SRAM2 
+    251            *     @arg FSMC_Bank1_NORSRAM3: FSMC Bank1 NOR/SRAM3 
+    252            *     @arg FSMC_Bank1_NORSRAM4: FSMC Bank1 NOR/SRAM4 
+    253            * @param  NewState: new state of the FSMC_Bank. This parameter can be: ENABLE or DISABLE.
+    254            * @retval None
+    255            */
+    256          void FSMC_NORSRAMCmd(uint32_t FSMC_Bank, FunctionalState NewState)
+    257          {
+    258            assert_param(IS_FSMC_NORSRAM_BANK(FSMC_Bank));
+    259            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    260            
+    261            if (NewState != DISABLE)
+    262            {
+    263              /* Enable the selected NOR/SRAM Bank by setting the MBKEN bit in the BCRx register */
+    264              FSMC_Bank1->BTCR[FSMC_Bank] |= FSMC_BCR1_MBKEN;
+    265            }
+    266            else
+    267            {
+    268              /* Disable the selected NOR/SRAM Bank by clearing the MBKEN bit in the BCRx register */
+    269              FSMC_Bank1->BTCR[FSMC_Bank] &= (uint32_t)(~FSMC_BCR1_MBKEN);
+    270            }
+    271          }
+    272          
+    273          /**
+    274            * @}
+    275            */ 
+    276          
+    277          /**
+    278            * @}
+    279            */
+    280          
+    281          /**
+    282            * @}
+    283            */
+    284          
+    285          /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   FSMC_NORSRAMCmd
+       0   FSMC_NORSRAMDeInit
+       0   FSMC_NORSRAMInit
+       0   FSMC_NORSRAMStructInit
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable1
+      50  FSMC_NORSRAMCmd
+      54  FSMC_NORSRAMDeInit
+     220  FSMC_NORSRAMInit
+     142  FSMC_NORSRAMStructInit
+
+ 
+ 470 bytes in section .text
+ 
+ 470 bytes of CODE memory
+
+Errors: none
+Warnings: none

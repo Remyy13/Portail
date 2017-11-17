@@ -1,0 +1,203 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.30.3.8024/W32 for ARM        24/Nov/2014  11:34:24
+# Copyright 1999-2014 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_crc.c
+#    Command line =  
+#        "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_crc.c"
+#        -D USE_STDPERIPH_DRIVER -D STM32L1XX_XL -lcN "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\List\" -o "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\Obj\" --no_cse --no_unroll
+#        --no_inline --no_code_motion --no_tbaa --no_clustering --no_scheduling
+#        --debug --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0_2\arm\INC\c\DLib_Config_Normal.h" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Device\ST\STM32L1xx\Include\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\inc\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\"
+#        -I "D:\Mes Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Include\" -I
+#        "D:\Mes Documents\ST32\Toolbox_TP1\" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\" -Ol
+#    List file    =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\List\stm32l1xx_crc.lst
+#    Object file  =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\Obj\stm32l1xx_crc.o
+#
+###############################################################################
+
+D:\Mes Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_crc.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    stm32l1xx_crc.c
+      4            * @author  MCD Application Team
+      5            * @version V1.3.0
+      6            * @date    31-January-2014
+      7            * @brief   This file provides all the CRC firmware functions.
+      8            ******************************************************************************
+      9            * @attention
+     10            *
+     11            * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+     12            *
+     13            * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+     14            * You may not use this file except in compliance with the License.
+     15            * You may obtain a copy of the License at:
+     16            *
+     17            *        http://www.st.com/software_license_agreement_liberty_v2
+     18            *
+     19            * Unless required by applicable law or agreed to in writing, software 
+     20            * distributed under the License is distributed on an "AS IS" BASIS, 
+     21            * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     22            * See the License for the specific language governing permissions and
+     23            * limitations under the License.
+     24            *
+     25            ******************************************************************************
+     26            */
+     27          
+     28          /* Includes ------------------------------------------------------------------*/
+     29          #include "stm32l1xx_crc.h"
+     30          
+     31          /** @addtogroup STM32L1xx_StdPeriph_Driver
+     32            * @{
+     33            */
+     34          
+     35          /** @defgroup CRC 
+     36            * @brief CRC driver modules
+     37            * @{
+     38            */
+     39          
+     40          /* Private typedef -----------------------------------------------------------*/
+     41          /* Private define ------------------------------------------------------------*/
+     42          /* Private macro -------------------------------------------------------------*/
+     43          /* Private variables ---------------------------------------------------------*/
+     44          /* Private function prototypes -----------------------------------------------*/
+     45          /* Private functions ---------------------------------------------------------*/
+     46          
+     47          /** @defgroup CRC_Private_Functions
+     48            * @{
+     49            */
+     50          
+     51          /**
+     52            * @brief  Resets the CRC Data register (DR).
+     53            * @param  None
+     54            * @retval None
+     55            */
+     56          void CRC_ResetDR(void)
+     57          {
+     58            /* Reset CRC generator */
+     59            CRC->CR = CRC_CR_RESET;
+     60          }
+     61          
+     62          /**
+     63            * @brief  Computes the 32-bit CRC of a given data word(32-bit).
+     64            * @param  Data: data word(32-bit) to compute its CRC.
+     65            * @retval 32-bit CRC
+     66            */
+     67          uint32_t CRC_CalcCRC(uint32_t Data)
+     68          {
+     69            CRC->DR = Data;
+     70            
+     71            return (CRC->DR);
+     72          }
+     73          
+     74          /**
+     75            * @brief  Computes the 32-bit CRC of a given buffer of data word(32-bit).
+     76            * @param  pBuffer: pointer to the buffer containing the data to be computed.
+     77            * @param  BufferLength: length of the buffer to be computed					
+     78            * @retval 32-bit CRC
+     79            */
+     80          uint32_t CRC_CalcBlockCRC(uint32_t pBuffer[], uint32_t BufferLength)
+     81          {
+     82            uint32_t index = 0;
+     83            
+     84            for(index = 0; index < BufferLength; index++)
+     85            {
+     86              CRC->DR = pBuffer[index];
+     87            }
+     88            return (CRC->DR);
+     89          }
+     90          
+     91          /**
+     92            * @brief  Returns the current CRC value.
+     93            * @param  None
+     94            * @retval 32-bit CRC
+     95            */
+     96          uint32_t CRC_GetCRC(void)
+     97          {
+     98            return (CRC->DR);
+     99          }
+    100          
+    101          /**
+    102            * @brief  Stores a 8-bit data in the Independent Data(ID) register.
+    103            * @param  IDValue: 8-bit value to be stored in the ID register 					
+    104            * @retval None
+    105            */
+    106          void CRC_SetIDRegister(uint8_t IDValue)
+    107          {
+    108            CRC->IDR = IDValue;
+    109          }
+    110          
+    111          /**
+    112            * @brief  Returns the 8-bit data stored in the Independent Data(ID) register.
+    113            * @param  None
+    114            * @retval 8-bit value of the ID register 
+    115            */
+    116          uint8_t CRC_GetIDRegister(void)
+    117          {
+    118            return (CRC->IDR);
+    119          }
+    120          
+    121          /**
+    122            * @}
+    123            */
+    124          
+    125          /**
+    126            * @}
+    127            */
+    128          
+    129          /**
+    130            * @}
+    131            */
+    132          
+    133          /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       4   CRC_CalcBlockCRC
+       0   CRC_CalcCRC
+       0   CRC_GetCRC
+       0   CRC_GetIDRegister
+       0   CRC_ResetDR
+       0   CRC_SetIDRegister
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable5
+       4  ??DataTable5_1
+       4  ??DataTable5_2
+      30  CRC_CalcBlockCRC
+      10  CRC_CalcCRC
+       6  CRC_GetCRC
+       8  CRC_GetIDRegister
+       8  CRC_ResetDR
+       6  CRC_SetIDRegister
+
+ 
+ 80 bytes in section .text
+ 
+ 80 bytes of CODE memory
+
+Errors: none
+Warnings: none

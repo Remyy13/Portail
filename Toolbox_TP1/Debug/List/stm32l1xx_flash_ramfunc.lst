@@ -1,0 +1,644 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.30.3.8024/W32 for ARM        24/Nov/2014  11:34:25
+# Copyright 1999-2014 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_flash_ramfunc.c
+#    Command line =  
+#        "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_flash_ramfunc.c"
+#        -D USE_STDPERIPH_DRIVER -D STM32L1XX_XL -lcN "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\List\" -o "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\Obj\" --no_cse --no_unroll
+#        --no_inline --no_code_motion --no_tbaa --no_clustering --no_scheduling
+#        --debug --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0_2\arm\INC\c\DLib_Config_Normal.h" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Device\ST\STM32L1xx\Include\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\inc\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\"
+#        -I "D:\Mes Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Include\" -I
+#        "D:\Mes Documents\ST32\Toolbox_TP1\" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\" -Ol
+#    List file    =  
+#        D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\List\stm32l1xx_flash_ramfunc.lst
+#    Object file  =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\Obj\stm32l1xx_flash_ramfunc.o
+#
+###############################################################################
+
+D:\Mes Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_flash_ramfunc.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    stm32l1xx_flash_ramfunc.c
+      4            * @author  MCD Application Team
+      5            * @version V1.3.0
+      6            * @date    31-January-2014
+      7            * @brief   This file provides all the Flash firmware functions which should be
+      8            *          executed from the internal SRAM. This file should be placed in 
+      9            *          internal SRAM. 
+     10            *          Other FLASH memory functions that can be used from the FLASH are 
+     11            *          defined in the "stm32l1xx_flash.c" file. 
+     12          @verbatim
+     13          
+     14              *** ARM Compiler ***
+     15              --------------------
+     16              [..] RAM functions are defined using the toolchain options. 
+     17                   Functions that are be executed in RAM should reside in a separate
+     18                   source module. Using the 'Options for File' dialog you can simply change
+     19                   the 'Code / Const' area of a module to a memory space in physical RAM.
+     20                   Available memory areas are declared in the 'Target' tab of the 
+     21                   Options for Target' dialog.
+     22          
+     23              *** ICCARM Compiler ***
+     24              -----------------------
+     25              [..] RAM functions are defined using a specific toolchain keyword "__ramfunc".
+     26          
+     27              *** GNU Compiler ***
+     28              --------------------
+     29              [..] RAM functions are defined using a specific toolchain attribute
+     30                   "__attribute__((section(".data")))".
+     31          
+     32              *** TASKING Compiler ***
+     33              ------------------------
+     34              [..] RAM functions are defined using a specific toolchain pragma. This 
+     35                   pragma is defined inside this file.
+     36          
+     37          @endverbatim
+     38            *
+     39            ******************************************************************************
+     40            * @attention
+     41            *
+     42            * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+     43            *
+     44            * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+     45            * You may not use this file except in compliance with the License.
+     46            * You may obtain a copy of the License at:
+     47            *
+     48            *        http://www.st.com/software_license_agreement_liberty_v2
+     49            *
+     50            * Unless required by applicable law or agreed to in writing, software 
+     51            * distributed under the License is distributed on an "AS IS" BASIS, 
+     52            * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     53            * See the License for the specific language governing permissions and
+     54            * limitations under the License.
+     55            *
+     56            ******************************************************************************
+     57            */
+     58          
+     59          /* Includes ------------------------------------------------------------------*/
+     60          #include "stm32l1xx_flash.h"
+     61          
+     62          /** @addtogroup STM32L1xx_StdPeriph_Driver
+     63            * @{
+     64            */
+     65          
+     66          /** @defgroup FLASH 
+     67            * @brief FLASH driver modules
+     68            * @{
+     69            */ 
+     70          
+     71          /* Private typedef -----------------------------------------------------------*/
+     72          /* Private define ------------------------------------------------------------*/
+     73          /* Private macro -------------------------------------------------------------*/
+     74          /* Private variables ---------------------------------------------------------*/
+     75          /* Private function prototypes -----------------------------------------------*/
+     76          static __RAM_FUNC GetStatus(void);
+     77          static __RAM_FUNC WaitForLastOperation(uint32_t Timeout);
+     78          
+     79          /* Private functions ---------------------------------------------------------*/
+     80           
+     81          /** @defgroup FLASH_Private_Functions
+     82            * @{
+     83            */ 
+     84          
+     85          /** @addtogroup FLASH_Group1
+     86           *
+     87          @verbatim  
+     88          @endverbatim
+     89            * @{
+     90            */  
+     91          #if defined (  __TASKING__  )
+     92          #pragma section_code_init on
+     93          #endif
+     94          
+     95          /**
+     96            * @brief  Enable or disable the power down mode during RUN mode.
+     97            * @note  This function can be used only when the user code is running from Internal SRAM.
+     98            * @param  NewState: new state of the power down mode during RUN mode.
+     99            *   This parameter can be: ENABLE or DISABLE.
+    100            * @retval None
+    101            */
+    102          __RAM_FUNC FLASH_RUNPowerDownCmd(FunctionalState NewState)
+    103          {
+    104            FLASH_Status status = FLASH_COMPLETE;
+    105           
+    106            if (NewState != DISABLE)
+    107            {
+    108               /* Unlock the RUN_PD bit */
+    109               FLASH->PDKEYR = FLASH_PDKEY1;
+    110               FLASH->PDKEYR = FLASH_PDKEY2;
+    111               
+    112               /* Set the RUN_PD bit in  FLASH_ACR register to put Flash in power down mode */
+    113               FLASH->ACR |= (uint32_t)FLASH_ACR_RUN_PD;
+    114          
+    115               if((FLASH->ACR & FLASH_ACR_RUN_PD) != FLASH_ACR_RUN_PD)
+    116               {
+    117                 status = FLASH_ERROR_PROGRAM;
+    118               }
+    119            }
+    120            else
+    121            {
+    122              /* Clear the RUN_PD bit in  FLASH_ACR register to put Flash in idle  mode */
+    123              FLASH->ACR &= (uint32_t)(~(uint32_t)FLASH_ACR_RUN_PD);
+    124            }
+    125          
+    126            /* Return the Write Status */
+    127            return status;  
+    128          }
+    129          
+    130          /**
+    131            * @}
+    132            */
+    133          
+    134          /** @addtogroup FLASH_Group2
+    135           *
+    136          @verbatim  
+    137          @endverbatim
+    138            * @{
+    139            */
+    140          
+    141          /**
+    142            * @brief  Erases a specified 2 page in program memory in parallel.
+    143            * @note   This function can be used only for STM32L1XX_HD and STM32L1XX_XL devices.
+    144            *         To correctly run this function, the FLASH_Unlock() function
+    145            *         must be called before.
+    146            *         Call the FLASH_Lock() to disable the flash memory access 
+    147            *        (recommended to protect the FLASH memory against possible unwanted operation).
+    148            * @param  Page_Address1: The page address in program memory to be erased in 
+    149            *         the first Bank (BANK1). This parameter should be:
+    150            *            - between 0x08000000 and 0x0802FF00 for STM32L1XX_HD devices
+    151            *            - between 0x08000000 and 0x0803FF00 for STM32L1XX_XL devices  
+    152            * @param  Page_Address2: The page address in program memory to be erased in 
+    153            *         the second Bank (BANK2). This parameter should be:
+    154            *            - between 0x08030000 and 0x0805FF00 for STM32L1XX_HD devices
+    155            *            - between 0x08040000 and 0x0807FF00 for STM32L1XX_XL devices  
+    156            * @note   A Page is erased in the Program memory only if the address to load 
+    157            *         is the start address of a page (multiple of 256 bytes).
+    158            * @retval FLASH Status: The returned value can be: 
+    159            *         FLASH_ERROR_PROGRAM, FLASH_ERROR_WRP, FLASH_COMPLETE or FLASH_TIMEOUT.
+    160            */
+    161          FLASH_Status FLASH_EraseParallelPage(uint32_t Page_Address1, uint32_t Page_Address2)
+    162          {
+    163            FLASH_Status status = FLASH_COMPLETE;
+    164          
+    165            /* Wait for last operation to be completed */
+    166            status = WaitForLastOperation(FLASH_ER_PRG_TIMEOUT);
+    167            
+    168            if(status == FLASH_COMPLETE)
+    169            {
+    170              /* If the previous operation is completed, proceed to erase the page */
+    171          
+    172              /* Set the PARALLBANK bit */
+    173              FLASH->PECR |= FLASH_PECR_PARALLBANK;
+    174              
+    175              /* Set the ERASE bit */
+    176              FLASH->PECR |= FLASH_PECR_ERASE;
+    177          
+    178              /* Set PROG bit */
+    179              FLASH->PECR |= FLASH_PECR_PROG;
+    180            
+    181              /* Write 00000000h to the first word of the first program page to erase */
+    182              *(__IO uint32_t *)Page_Address1 = 0x00000000;
+    183              /* Write 00000000h to the first word of the second program page to erase */    
+    184              *(__IO uint32_t *)Page_Address2 = 0x00000000;    
+    185           
+    186              /* Wait for last operation to be completed */
+    187              status = WaitForLastOperation(FLASH_ER_PRG_TIMEOUT);
+    188          
+    189              /* If the erase operation is completed, disable the ERASE, PROG and PARALLBANK bits */
+    190              FLASH->PECR &= (uint32_t)(~FLASH_PECR_PROG);
+    191              FLASH->PECR &= (uint32_t)(~FLASH_PECR_ERASE);
+    192              FLASH->PECR &= (uint32_t)(~FLASH_PECR_PARALLBANK);   
+    193            }     
+    194            /* Return the Erase Status */
+    195            return status;
+    196          }
+    197          
+    198          /**
+    199            * @brief  Programs a half page in program memory.
+    200            * @param  Address: specifies the address to be written.
+    201            * @param  pBuffer: pointer to the buffer  containing the data to be  written to 
+    202            *         the half page.
+    203            * @note   To correctly run this function, the FLASH_Unlock() function
+    204            *         must be called before.
+    205            *         Call the FLASH_Lock() to disable the flash memory access  
+    206            *         (recommended to protect the FLASH memory against possible unwanted operation)
+    207            * @note   Half page write is possible only from SRAM.
+    208            * @note   If there are more than 32 words to write, after 32 words another 
+    209            *         Half Page programming operation starts and has to be finished.
+    210            * @note   A half page is written to the program memory only if the first 
+    211            *         address to load is the start address of a half page (multiple of 128 
+    212            *         bytes) and the 31 remaining words to load are in the same half page.
+    213            * @note   During the Program memory half page write all read operations are 
+    214            *         forbidden (this includes DMA read operations and debugger read 
+    215            *         operations such as breakpoints, periodic updates, etc.).
+    216            * @note   If a PGAERR is set during a Program memory half page write, the 
+    217            *         complete write operation is aborted. Software should then reset the 
+    218            *         FPRG and PROG/DATA bits and restart the write operation from the 
+    219            *         beginning.
+    220            * @retval FLASH Status: The returned value can be:  
+    221            *   FLASH_ERROR_PROGRAM, FLASH_ERROR_WRP, FLASH_COMPLETE or FLASH_TIMEOUT. 
+    222            */
+    223          __RAM_FUNC FLASH_ProgramHalfPage(uint32_t Address, uint32_t* pBuffer)
+    224          {
+    225            uint32_t count = 0; 
+    226             
+    227            FLASH_Status status = FLASH_COMPLETE;
+    228          
+    229            /* Set the DISMCYCINT[0] bit in the Auxillary Control Register (0xE000E008) 
+    230               This bit prevents the interruption of multicycle instructions and therefore 
+    231               will increase the interrupt latency. of Cortex-M3. */
+    232            SCnSCB->ACTLR |= SCnSCB_ACTLR_DISMCYCINT_Msk;
+    233            
+    234            /* Wait for last operation to be completed */
+    235            status = WaitForLastOperation(FLASH_ER_PRG_TIMEOUT);
+    236            
+    237            if(status == FLASH_COMPLETE)
+    238            {
+    239              /* if the previous operation is completed, proceed to program the new  
+    240              half page */
+    241              FLASH->PECR |= FLASH_PECR_FPRG;
+    242              FLASH->PECR |= FLASH_PECR_PROG;
+    243              
+    244              /* Write one half page directly with 32 different words */
+    245              while(count < 32)
+    246              {
+    247                *(__IO uint32_t*) (Address + (4 * count)) = *(pBuffer++);
+    248                count ++;  
+    249              }
+    250              /* Wait for last operation to be completed */
+    251              status = WaitForLastOperation(FLASH_ER_PRG_TIMEOUT);
+    252           
+    253              /* if the write operation is completed, disable the PROG and FPRG bits */
+    254              FLASH->PECR &= (uint32_t)(~FLASH_PECR_PROG);
+    255              FLASH->PECR &= (uint32_t)(~FLASH_PECR_FPRG);
+    256            }
+    257          
+    258            SCnSCB->ACTLR &= ~SCnSCB_ACTLR_DISMCYCINT_Msk;
+    259              
+    260            /* Return the Write Status */
+    261            return status;
+    262          }
+    263          
+    264          /**
+    265            * @brief  Programs 2 half page in program memory in parallel.
+    266            * @param  Address1: specifies the first address to be written in the first bank 
+    267            *        (BANK1).This parameter should be:
+    268            *            - between 0x08000000 and 0x0802FF80 for STM32L1XX_HD devices
+    269            *            - between 0x08000000 and 0x0803FF80 for STM32L1XX_XL devices 
+    270            * @param  pBuffer1: pointer to the buffer  containing the data to be  written 
+    271            *         to the first half page in the first bank.
+    272            * @param  Address2: specifies the second address to be written in the second bank
+    273            *        (BANK2).  This parameter should be:
+    274            *            - between 0x08030000 and 0x0805FF80 for STM32L1XX_HD devices
+    275            *            - between 0x08040000 and 0x0807FF80 for STM32L1XX_XL devices
+    276            * @param  pBuffer2: pointer to the buffer containing the data to be  written 
+    277            *         to the second half page in the second bank.
+    278            * @note   This function can be used only for STM32L1XX_HD and STM32L1XX_XL devices.
+    279            * @note   To correctly run this function, the FLASH_Unlock() function
+    280            *         must be called before.
+    281            *         Call the FLASH_Lock() to disable the flash memory access  
+    282            *         (recommended to protect the FLASH memory against possible unwanted operation).
+    283            * @note   Half page write is possible only from SRAM.
+    284            * @note   If there are more than 32 words to write, after 32 words another 
+    285            *         Half Page programming operation starts and has to be finished.
+    286            * @note   A half page is written to the program memory only if the first 
+    287            *         address to load is the start address of a half page (multiple of 128 
+    288            *         bytes) and the 31 remaining words to load are in the same half page.
+    289            * @note   During the Program memory half page write all read operations are 
+    290            *         forbidden (this includes DMA read operations and debugger read 
+    291            *         operations such as breakpoints, periodic updates, etc.).
+    292            * @note   If a PGAERR is set during a Program memory half page write, the 
+    293            *         complete write operation is aborted. Software should then reset the 
+    294            *         FPRG and PROG/DATA bits and restart the write operation from the 
+    295            *         beginning.
+    296            * @retval FLASH Status: The returned value can be:  
+    297            *         FLASH_ERROR_PROGRAM, FLASH_ERROR_WRP, FLASH_COMPLETE or FLASH_TIMEOUT.
+    298            */
+    299          __RAM_FUNC FLASH_ProgramParallelHalfPage(uint32_t Address1, uint32_t* pBuffer1, uint32_t Address2, uint32_t* pBuffer2)
+    300          {
+    301            uint32_t count = 0; 
+    302             
+    303            FLASH_Status status = FLASH_COMPLETE;
+    304          
+    305            /* Set the DISMCYCINT[0] bit in the Auxillary Control Register (0xE000E008) 
+    306               This bit prevents the interruption of multicycle instructions and therefore 
+    307               will increase the interrupt latency. of Cortex-M3. */
+    308            SCnSCB->ACTLR |= SCnSCB_ACTLR_DISMCYCINT_Msk;
+    309          
+    310            /* Wait for last operation to be completed */
+    311            status = WaitForLastOperation(FLASH_ER_PRG_TIMEOUT);
+    312            
+    313            if(status == FLASH_COMPLETE)
+    314            {
+    315              /* If the previous operation is completed, proceed to program the new  
+    316                 half page */
+    317              FLASH->PECR |= FLASH_PECR_PARALLBANK;
+    318              FLASH->PECR |= FLASH_PECR_FPRG;
+    319              FLASH->PECR |= FLASH_PECR_PROG;
+    320              
+    321              /* Write the first half page directly with 32 different words */
+    322              while(count < 32)
+    323              {
+    324                *(__IO uint32_t*) (Address1 + (4 * count)) = *(pBuffer1++);
+    325                count ++;  
+    326              }
+    327              count = 0;
+    328              /* Write the second half page directly with 32 different words */
+    329              while(count < 32)
+    330              {
+    331                *(__IO uint32_t*) (Address2 + (4 * count)) = *(pBuffer2++);
+    332                count ++;  
+    333              }
+    334              /* Wait for last operation to be completed */
+    335              status = WaitForLastOperation(FLASH_ER_PRG_TIMEOUT);
+    336           
+    337              /* if the write operation is completed, disable the PROG, FPRG and PARALLBANK bits */
+    338              FLASH->PECR &= (uint32_t)(~FLASH_PECR_PROG);
+    339              FLASH->PECR &= (uint32_t)(~FLASH_PECR_FPRG);
+    340              FLASH->PECR &= (uint32_t)(~FLASH_PECR_PARALLBANK);
+    341            }
+    342          
+    343            SCnSCB->ACTLR &= ~SCnSCB_ACTLR_DISMCYCINT_Msk;
+    344              
+    345            /* Return the Write Status */
+    346            return status;
+    347          }
+    348          
+    349          /**
+    350            * @}
+    351            */
+    352          
+    353          /** @addtogroup FLASH_Group3
+    354           *
+    355          @verbatim  
+    356          @endverbatim
+    357            * @{
+    358            */
+    359          
+    360          /**
+    361            * @brief  Erase a double word in data memory.
+    362            * @param  Address: specifies the address to be erased.
+    363            * @note   To correctly run this function, the DATA_EEPROM_Unlock() function
+    364            *         must be called before.
+    365            *         Call the DATA_EEPROM_Lock() to he data EEPROM access
+    366            *         and Flash program erase control register access(recommended to protect 
+    367            *         the DATA_EEPROM against possible unwanted operation).
+    368            * @note   Data memory double word erase is possible only from SRAM.
+    369            * @note   A double word is erased to the data memory only if the first address 
+    370            *         to load is the start address of a double word (multiple of 8 bytes).
+    371            * @note   During the Data memory double word erase, all read operations are 
+    372            *         forbidden (this includes DMA read operations and debugger read 
+    373            *         operations such as breakpoints, periodic updates, etc.).
+    374            * @retval FLASH Status: The returned value can be: 
+    375            *   FLASH_ERROR_PROGRAM, FLASH_ERROR_WRP, FLASH_COMPLETE or FLASH_TIMEOUT.
+    376            */
+    377          
+    378          __RAM_FUNC DATA_EEPROM_EraseDoubleWord(uint32_t Address)
+    379          {
+    380            FLASH_Status status = FLASH_COMPLETE;
+    381            
+    382            /* Set the DISMCYCINT[0] bit in the Auxillary Control Register (0xE000E008) 
+    383               This bit prevents the interruption of multicycle instructions and therefore 
+    384               will increase the interrupt latency. of Cortex-M3. */
+    385            SCnSCB->ACTLR |= SCnSCB_ACTLR_DISMCYCINT_Msk;
+    386              
+    387            /* Wait for last operation to be completed */
+    388            status = WaitForLastOperation(FLASH_ER_PRG_TIMEOUT);
+    389            
+    390            if(status == FLASH_COMPLETE)
+    391            {
+    392              /* If the previous operation is completed, proceed to erase the next double word */
+    393              /* Set the ERASE bit */
+    394              FLASH->PECR |= FLASH_PECR_ERASE;
+    395          
+    396              /* Set DATA bit */
+    397              FLASH->PECR |= FLASH_PECR_DATA;
+    398             
+    399              /* Write 00000000h to the 2 words to erase */
+    400              *(__IO uint32_t *)Address = 0x00000000;
+    401              Address += 4;
+    402              *(__IO uint32_t *)Address = 0x00000000;
+    403             
+    404              /* Wait for last operation to be completed */
+    405              status = WaitForLastOperation(FLASH_ER_PRG_TIMEOUT);
+    406              
+    407              /* If the erase operation is completed, disable the ERASE and DATA bits */
+    408              FLASH->PECR &= (uint32_t)(~FLASH_PECR_ERASE);
+    409              FLASH->PECR &= (uint32_t)(~FLASH_PECR_DATA);
+    410            }  
+    411            
+    412            SCnSCB->ACTLR &= ~SCnSCB_ACTLR_DISMCYCINT_Msk;
+    413              
+    414            /* Return the erase status */
+    415            return status;
+    416          }
+    417          
+    418          /**
+    419            * @brief  Write a double word in data memory without erase.
+    420            * @param  Address: specifies the address to be written.
+    421            * @param  Data: specifies the data to be written.
+    422            * @note   To correctly run this function, the DATA_EEPROM_Unlock() function
+    423            *         must be called before.
+    424            *         Call the DATA_EEPROM_Lock() to he data EEPROM access
+    425            *         and Flash program erase control register access(recommended to protect 
+    426            *         the DATA_EEPROM against possible unwanted operation).
+    427            * @note   Data memory double word write is possible only from SRAM.
+    428            * @note   A data memory double word is written to the data memory only if the 
+    429            *         first address to load is the start address of a double word (multiple 
+    430            *         of double word).
+    431            * @note   During the Data memory double word write, all read operations are 
+    432            *         forbidden (this includes DMA read operations and debugger read 
+    433            *         operations such as breakpoints, periodic updates, etc.).
+    434            * @retval FLASH Status: The returned value can be: 
+    435            *   FLASH_ERROR_PROGRAM, FLASH_ERROR_WRP, FLASH_COMPLETE or FLASH_TIMEOUT. 
+    436            */ 
+    437          __RAM_FUNC DATA_EEPROM_ProgramDoubleWord(uint32_t Address, uint64_t Data)
+    438          {
+    439            FLASH_Status status = FLASH_COMPLETE;
+    440          
+    441            /* Set the DISMCYCINT[0] bit in the Auxillary Control Register (0xE000E008) 
+    442               This bit prevents the interruption of multicycle instructions and therefore 
+    443               will increase the interrupt latency. of Cortex-M3. */
+    444            SCnSCB->ACTLR |= SCnSCB_ACTLR_DISMCYCINT_Msk;
+    445              
+    446            /* Wait for last operation to be completed */
+    447            status = WaitForLastOperation(FLASH_ER_PRG_TIMEOUT);
+    448            
+    449            if(status == FLASH_COMPLETE)
+    450            {
+    451              /* If the previous operation is completed, proceed to program the new data*/
+    452              FLASH->PECR |= FLASH_PECR_FPRG;
+    453              FLASH->PECR |= FLASH_PECR_DATA;
+    454              
+    455              /* Write the 2 words */  
+    456               *(__IO uint32_t *)Address = (uint32_t) Data;
+    457               Address += 4;
+    458               *(__IO uint32_t *)Address = (uint32_t) (Data >> 32);
+    459              
+    460              /* Wait for last operation to be completed */
+    461              status = WaitForLastOperation(FLASH_ER_PRG_TIMEOUT);
+    462              
+    463              /* If the write operation is completed, disable the FPRG and DATA bits */
+    464              FLASH->PECR &= (uint32_t)(~FLASH_PECR_FPRG);
+    465              FLASH->PECR &= (uint32_t)(~FLASH_PECR_DATA);     
+    466            }
+    467            
+    468            SCnSCB->ACTLR &= ~SCnSCB_ACTLR_DISMCYCINT_Msk;
+    469              
+    470            /* Return the Write Status */
+    471            return status;
+    472          }
+    473          
+    474          /**
+    475            * @}
+    476            */
+    477          
+    478          /**
+    479            * @brief  Returns the FLASH Status.
+    480            * @param  None
+    481            * @retval FLASH Status: The returned value can be: FLASH_BUSY, 
+    482            *   FLASH_ERROR_PROGRAM, FLASH_ERROR_WRP or FLASH_COMPLETE
+    483            */
+    484          static __RAM_FUNC GetStatus(void)
+    485          {
+    486            FLASH_Status FLASHstatus = FLASH_COMPLETE;
+    487            
+    488            if((FLASH->SR & FLASH_FLAG_BSY) == FLASH_FLAG_BSY) 
+    489            {
+    490              FLASHstatus = FLASH_BUSY;
+    491            }
+    492            else 
+    493            {  
+    494              if((FLASH->SR & (uint32_t)FLASH_FLAG_WRPERR)!= (uint32_t)0x00)
+    495              { 
+    496                FLASHstatus = FLASH_ERROR_WRP;
+    497              }
+    498              else 
+    499              {
+    500                if((FLASH->SR & (uint32_t)0x1E00) != (uint32_t)0x00)
+    501                {
+    502                  FLASHstatus = FLASH_ERROR_PROGRAM; 
+    503                }
+    504                else
+    505                {
+    506                  FLASHstatus = FLASH_COMPLETE;
+    507                }
+    508              }
+    509            }
+    510            /* Return the FLASH Status */
+    511            return FLASHstatus;
+    512          }
+    513          
+    514          /**
+    515            * @brief  Waits for a FLASH operation to complete or a TIMEOUT to occur.
+    516            * @param  Timeout: FLASH programming Timeout
+    517            * @retval FLASH Status: The returned value can be: FLASH_BUSY, 
+    518            *   FLASH_ERROR_PROGRAM, FLASH_ERROR_WRP, FLASH_COMPLETE or 
+    519            *   FLASH_TIMEOUT.
+    520            */
+    521          static __RAM_FUNC  WaitForLastOperation(uint32_t Timeout)
+    522          { 
+    523            __IO FLASH_Status status = FLASH_COMPLETE;
+    524             
+    525            /* Check for the FLASH Status */
+    526            status = GetStatus();
+    527            
+    528            /* Wait for a FLASH operation to complete or a TIMEOUT to occur */
+    529            while((status == FLASH_BUSY) && (Timeout != 0x00))
+    530            {
+    531              status = GetStatus();
+    532              Timeout--;
+    533            }
+    534            
+    535            if(Timeout == 0x00 )
+    536            {
+    537              status = FLASH_TIMEOUT;
+    538            }
+    539            /* Return the operation status */
+    540            return status;
+    541          }
+    542          
+    543          #if defined (  __TASKING__  )
+    544          #pragma section_code_init restore
+    545          #endif
+    546          
+    547          /**
+    548            * @}
+    549            */
+    550             
+    551            /**
+    552            * @}
+    553            */ 
+    554          
+    555          /**
+    556            * @}
+    557            */ 
+    558          
+    559          /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   DATA_EEPROM_EraseDoubleWord
+         8   -> WaitForLastOperation
+      16   DATA_EEPROM_ProgramDoubleWord
+        16   -> WaitForLastOperation
+      16   FLASH_EraseParallelPage
+        16   -> WaitForLastOperation
+      16   FLASH_ProgramHalfPage
+        16   -> WaitForLastOperation
+      24   FLASH_ProgramParallelHalfPage
+        24   -> WaitForLastOperation
+       0   FLASH_RUNPowerDownCmd
+       0   GetStatus
+      16   WaitForLastOperation
+        16   -> GetStatus
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable6
+       4  ??DataTable6_1
+       4  ??DataTable6_2
+       4  ??DataTable6_3
+       4  ??DataTable6_4
+       4  ??DataTable6_5
+       4  ??DataTable6_6
+     114  DATA_EEPROM_EraseDoubleWord
+     114  DATA_EEPROM_ProgramDoubleWord
+     114  FLASH_EraseParallelPage
+     124  FLASH_ProgramHalfPage
+     186  FLASH_ProgramParallelHalfPage
+      62  FLASH_RUNPowerDownCmd
+      46  GetStatus
+      60  WaitForLastOperation
+
+ 
+ 848 bytes in section .textrw
+ 
+ 848 bytes of CODE memory
+
+Errors: none
+Warnings: none

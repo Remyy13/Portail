@@ -1,0 +1,624 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.30.3.8024/W32 for ARM        24/Nov/2014  11:34:27
+# Copyright 1999-2014 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\stm32l1xx_nucleo.c
+#    Command line =  
+#        "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\stm32l1xx_nucleo.c"
+#        -D USE_STDPERIPH_DRIVER -D STM32L1XX_XL -lcN "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\List\" -o "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\Obj\" --no_cse --no_unroll
+#        --no_inline --no_code_motion --no_tbaa --no_clustering --no_scheduling
+#        --debug --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0_2\arm\INC\c\DLib_Config_Normal.h" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Device\ST\STM32L1xx\Include\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\inc\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\"
+#        -I "D:\Mes Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Include\" -I
+#        "D:\Mes Documents\ST32\Toolbox_TP1\" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\" -Ol
+#    List file    =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\List\stm32l1xx_nucleo.lst
+#    Object file  =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\Obj\stm32l1xx_nucleo.o
+#
+###############################################################################
+
+D:\Mes Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\stm32l1xx_nucleo.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    stm32l1xx_nucleo.c
+      4            * @author  MCD Application Team
+      5            * @version V1.0.0
+      6            * @date    11-February-2014
+      7            * @brief   This file provides set of firmware functions to manage Leds and
+      8            *          push-button available on STM32NUCLEO Kit from STMicroelectronics.
+      9            *          It provides also functions to configure and manage the STM32F3xx 
+     10            *          resources (SPI and ADC) used to drive LCD, uSD card and Joystick
+     11            *          available on adafruit 1.8" TFT shield.   
+     12            ******************************************************************************
+     13            * @attention
+     14            *
+     15            * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+     16            *
+     17            * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+     18            * You may not use this file except in compliance with the License.
+     19            * You may obtain a copy of the License at:
+     20            *
+     21            *        http://www.st.com/software_license_agreement_liberty_v2
+     22            *
+     23            * Unless required by applicable law or agreed to in writing, software 
+     24            * distributed under the License is distributed on an "AS IS" BASIS, 
+     25            * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     26            * See the License for the specific language governing permissions and
+     27            * limitations under the License.
+     28            *
+     29            ******************************************************************************
+     30            */  
+     31            
+     32          /* Includes ------------------------------------------------------------------*/
+     33          #include "stm32l1xx_nucleo.h"
+     34          
+     35          /** @addtogroup Utilities
+     36            * @{
+     37            */ 
+     38          
+     39          /** @addtogroup STM32L1XX_NUCLEO
+     40            * @{
+     41            */
+     42                
+     43          /** @defgroup STM32L1XX_NUCLEO_LOW_LEVEL 
+     44            * @brief This file provides set of firmware functions to manage Leds and push-button
+     45            *        available on STM32NUCLEO Kit from STMicroelectronics.
+     46            * @{
+     47            */ 
+     48          
+     49          /* Private typedef -----------------------------------------------------------*/
+     50          /* Private define ------------------------------------------------------------*/
+     51          /* Private macro -------------------------------------------------------------*/
+     52              
+     53          /** @defgroup STM32L1XX_NUCLEO_LOW_LEVEL_Private_Variables
+     54            * @{
+     55            */ 
+     56          GPIO_TypeDef* GPIO_PORT[LEDn] = {LED2_GPIO_PORT};
+     57          const uint16_t GPIO_PIN[LEDn] = {LED2_PIN};
+     58          const uint32_t GPIO_CLK[LEDn] = {LED2_GPIO_CLK};
+     59          
+     60          GPIO_TypeDef* BUTTON_PORT[BUTTONn] = {USER_BUTTON_GPIO_PORT}; 
+     61          
+     62          const uint16_t BUTTON_PIN[BUTTONn] = {USER_BUTTON_PIN}; 
+     63          
+     64          const uint32_t BUTTON_CLK[BUTTONn] = {USER_BUTTON_GPIO_CLK};
+     65          
+     66          const uint16_t BUTTON_EXTI_LINE[BUTTONn] = {USER_BUTTON_EXTI_LINE};
+     67          
+     68          const uint8_t BUTTON_PORT_SOURCE[BUTTONn] = {USER_BUTTON_EXTI_PORT_SOURCE};
+     69          								 
+     70          const uint8_t BUTTON_PIN_SOURCE[BUTTONn] = {USER_BUTTON_EXTI_PIN_SOURCE}; 
+     71          const uint8_t BUTTON_IRQn[BUTTONn] = {USER_BUTTON_EXTI_IRQn};
+     72          
+     73          /**
+     74            * @}
+     75            */ 
+     76          
+     77          /* Private function prototypes -----------------------------------------------*/
+     78          
+     79          /** @defgroup STM32L1XX_NUCLEO_LOW_LEVEL_Private_Functions
+     80            * @{
+     81            */ 
+     82          
+     83          /**
+     84            * @brief  Configures LED GPIO.
+     85            * @param  Led: Specifies the Led to be configured. 
+     86            *         This parameter must be: LED2
+     87            * @retval None
+     88            */
+     89          void STM_EVAL_LEDInit(Led_TypeDef Led)
+     90          {
+     91            GPIO_InitTypeDef  GPIO_InitStructure;
+     92            
+     93            /* Enable the GPIO Clock */
+     94            RCC_AHBPeriphClockCmd(GPIO_CLK[Led], ENABLE);
+     95            
+     96            /* Configure the GPIO pin */
+     97            GPIO_InitStructure.GPIO_Pin = GPIO_PIN[Led];
+     98            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+     99            GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    100            GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    101            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+    102            GPIO_Init(GPIO_PORT[Led], &GPIO_InitStructure);  
+    103          }
+    104          
+    105          /**
+    106            * @brief  Turns selected LED On.
+    107            * @param  Led: Specifies the Led to be set on. 
+    108            *         This parameter must be: LED2
+    109            * @retval None
+    110            */
+    111          void STM_EVAL_LEDOn(Led_TypeDef Led)
+    112          {   
+    113            GPIO_PORT[Led]->BSRRL = GPIO_PIN[Led]; 
+    114          }
+    115          
+    116          /**
+    117            * @brief  Turns selected LED Off.
+    118            * @param  Led: Specifies the Led to be set off. 
+    119            *         This parameter must be: LED2
+    120            * @retval None
+    121            */
+    122          void STM_EVAL_LEDOff(Led_TypeDef Led)
+    123          {
+    124            GPIO_PORT[Led]->BSRRH = GPIO_PIN[Led]; 
+    125          }
+    126          
+    127          /**
+    128            * @brief  Toggles the selected LED.
+    129            * @param  Led: Specifies the Led to be toggled. 
+    130            *         This parameter must be: LED2
+    131            * @retval None
+    132            */
+    133          void STM_EVAL_LEDToggle(Led_TypeDef Led)
+    134          {
+    135            GPIO_PORT[Led]->ODR ^= GPIO_PIN[Led];
+    136          }
+    137          /**
+    138            * @brief  Configures Button GPIO and associated EXTI Line.
+    139            * @param  Button: Specifies the Button to be configured.
+    140            *   This parameter must be: BUTTON_USER
+    141            * @param  Button_Mode: Specifies Button mode.
+    142            *   This parameter can be one of following parameters:   
+    143            *     @arg BUTTON_MODE_GPIO: Button will be used as simple IO 
+    144            *     @arg BUTTON_MODE_EXTI: Button will be connected to EXTI line with interrupt
+    145            *                            generation capability  
+    146            * @retval None
+    147            */
+    148          void STM_EVAL_PBInit(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode)
+    149          {
+    150            GPIO_InitTypeDef GPIO_InitStructure;
+    151            EXTI_InitTypeDef EXTI_InitStructure;
+    152            NVIC_InitTypeDef NVIC_InitStructure;
+    153          
+    154            /* Enable the GPIO Clock */
+    155            RCC_AHBPeriphClockCmd(BUTTON_CLK[Button], ENABLE);
+    156            RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+    157          
+    158            /* Configure Button pin as input */
+    159            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    160            GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    161            GPIO_InitStructure.GPIO_Pin = BUTTON_PIN[Button];
+    162            GPIO_Init(BUTTON_PORT[Button], &GPIO_InitStructure);
+    163          
+    164            if (Button_Mode == BUTTON_MODE_EXTI)
+    165            {
+    166              /* Connect Button EXTI Line to Button GPIO Pin */
+    167              SYSCFG_EXTILineConfig(BUTTON_PORT_SOURCE[Button], BUTTON_PIN_SOURCE[Button]);
+    168          
+    169              /* Configure Button EXTI line */
+    170              EXTI_InitStructure.EXTI_Line = BUTTON_EXTI_LINE[Button];
+    171              EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+    172              EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+    173              EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+    174              EXTI_Init(&EXTI_InitStructure);
+    175          
+    176              /* Enable and set Button EXTI Interrupt to the lowest priority */
+    177              NVIC_InitStructure.NVIC_IRQChannel = BUTTON_IRQn[Button];
+    178              NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+    179              NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+    180              NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    181          
+    182              NVIC_Init(&NVIC_InitStructure); 
+    183            }
+    184          }
+    185          
+    186          /**
+    187            * @brief  Returns the selected Button state.
+    188            * @param  Button: Specifies the Button to be checked.
+    189            *   This parameter must be: BUTTON_USER  
+    190            * @retval The Button GPIO pin value.
+    191            */
+    192          uint32_t STM_EVAL_PBGetState(Button_TypeDef Button)
+    193          {
+    194            return GPIO_ReadInputDataBit(BUTTON_PORT[Button], BUTTON_PIN[Button]);
+    195          }
+    196          
+    197          /**
+    198            * @brief  Initializes the SPI Interface used to drive the LCD and uSD card 
+    199            *         available on adafruit 1.8" TFT shield.
+    200            * @note   This function must by called by the application code before to initialize
+    201            *         the LCD and uSD card.    
+    202            * @param  None
+    203            * @retval None
+    204            */
+    205          void STM_SPI_Init(void)
+    206          {
+    207            GPIO_InitTypeDef  GPIO_InitStructure;
+    208            SPI_InitTypeDef   SPI_InitStructure;
+    209          
+    210            /* Enable GPIOs clock */
+    211            RCC_AHBPeriphClockCmd(SPI_MOSI_GPIO_CLK | SPI_MISO_GPIO_CLK | SPI_SCK_GPIO_CLK, ENABLE);
+    212          
+    213            /* Enable SPI clock */
+    214            RCC_APB2PeriphClockCmd(LCD_SD_SPI_CLK, ENABLE); 
+    215          
+    216            /* Configure SPI SCK pin */
+    217            GPIO_InitStructure.GPIO_Pin = SPI_SCK_PIN;
+    218            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+    219            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+    220            GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    221            GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+    222            GPIO_Init(SPI_SCK_GPIO_PORT, &GPIO_InitStructure);
+    223          
+    224            /* Configure SPI MISO pin */
+    225            GPIO_InitStructure.GPIO_Pin = SPI_MISO_PIN;
+    226            GPIO_Init(SPI_MISO_GPIO_PORT, &GPIO_InitStructure);
+    227          
+    228            /* Configure SPI MOSI pin */
+    229            GPIO_InitStructure.GPIO_Pin = SPI_MOSI_PIN;
+    230            GPIO_Init(SPI_MOSI_GPIO_PORT, &GPIO_InitStructure);
+    231            
+    232            /* Connect SCK, MISO and MOSI pins to SPI alternate */
+    233            GPIO_PinAFConfig(SPI_SCK_GPIO_PORT, SPI_SCK_SOURCE, SPI_SCK_AF);
+    234            GPIO_PinAFConfig(SPI_MISO_GPIO_PORT, SPI_MISO_SOURCE, SPI_MISO_AF);
+    235            GPIO_PinAFConfig(SPI_MOSI_GPIO_PORT, SPI_MOSI_SOURCE, SPI_MOSI_AF); 
+    236            
+    237            /* Configure SPI */
+    238            SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+    239            SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+    240            SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+    241            SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
+    242            SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
+    243            SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+    244                /* SPI baudrate is set to 8 MHz maximum (PCLK2/SPI_BaudRatePrescaler = 32/4 = 8 MHz) 
+    245                 to verify these constraints:
+    246                    - ST7735R LCD SPI interface max baudrate is 15MHz for write and 6.66MHz for read
+    247                      Since the provided driver doesn't use read capability from LCD, only constraint 
+    248                      on write baudrate is considered.
+    249                    - SD card SPI interface max baudrate is 25MHz for write/read
+    250                    - PCLK2 max frequency is 32 MHz 
+    251                 */
+    252            SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
+    253            SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+    254            SPI_InitStructure.SPI_CRCPolynomial = 7;
+    255            SPI_Init(LCD_SD_SPI, &SPI_InitStructure);
+    256              
+    257            /* Enable SPI */
+    258            SPI_Cmd(LCD_SD_SPI, ENABLE);
+    259          }
+    260          
+    261          /**
+    262            * @brief  Configures LCD control lines (CS and DC) in Output Push-Pull mode.
+    263            * @param  None
+    264            * @retval None
+    265            */
+    266          void LCD_CtrlLines_Config(void)
+    267          {
+    268            GPIO_InitTypeDef GPIO_InitStructure;
+    269          
+    270            /* Enable GPIOs clock */
+    271            RCC_AHBPeriphClockCmd(LCD_CS_GPIO_CLK | LCD_DC_GPIO_CLK, ENABLE);
+    272          
+    273            /* Configure CS in Output Push-Pull mode */
+    274            GPIO_InitStructure.GPIO_Pin = LCD_CS_PIN;
+    275            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    276            GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    277            GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    278            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+    279            GPIO_Init(LCD_CS_GPIO_PORT, &GPIO_InitStructure);
+    280            
+    281            /* Configure DC in Output Push-Pull mode */
+    282            GPIO_InitStructure.GPIO_Pin = LCD_DC_PIN;
+    283            GPIO_Init(LCD_DC_GPIO_PORT, &GPIO_InitStructure);
+    284          
+    285            /* Set chip select pin high */
+    286            LCD_CS_HIGH();
+    287          }
+    288          
+    289          /**
+    290            * @brief  Configures uSD control line (CS) in Output Push-Pull mode.
+    291            * @param  None
+    292            * @retval None
+    293            */
+    294          void SD_CtrlLines_Config(void)
+    295          {
+    296            GPIO_InitTypeDef GPIO_InitStructure;
+    297          
+    298            /* Enable GPIO clock */
+    299            RCC_AHBPeriphClockCmd(SD_CS_GPIO_CLK , ENABLE);
+    300          
+    301            /* Configure CS in Output Push-Pull mode */
+    302            GPIO_InitStructure.GPIO_Pin = SD_CS_PIN;
+    303            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    304            GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    305            GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    306            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz;
+    307            GPIO_Init(SD_CS_GPIO_PORT, &GPIO_InitStructure);
+    308          
+    309            /* Set chip select pin high */
+    310            SD_CS_HIGH();
+    311          }
+    312          
+    313          /**
+    314            * @brief  Sends a byte through the SPI interface and return the byte received 
+    315            *         from the SPI bus.
+    316            * @param  Data: byte send.
+    317            * @retval The received byte value
+    318            * @retval None
+    319            */
+    320          uint8_t STM_SPI_WriteRead(uint8_t Data)
+    321          {
+    322            uint8_t tmp = 0x00;
+    323           
+    324            /* Wait until the transmit buffer is empty */ 
+    325            while(SPI_I2S_GetFlagStatus(LCD_SD_SPI, SPI_I2S_FLAG_TXE) != SET)
+    326            {
+    327            }  
+    328            /* Send the byte */
+    329            SPI_I2S_SendData(LCD_SD_SPI, Data);
+    330            
+    331            /* Wait to receive a byte */ 
+    332            while(SPI_I2S_GetFlagStatus(LCD_SD_SPI, SPI_I2S_FLAG_RXNE) != SET)
+    333            {
+    334            }
+    335            /* Return the byte read from the SPI bus */    
+    336            tmp = SPI_I2S_ReceiveData(LCD_SD_SPI); 
+    337          
+    338            /* Wait until the TXE and BSY flags are set */ 
+    339            while(SPI_I2S_GetFlagStatus(LCD_SD_SPI, SPI_I2S_FLAG_TXE) != SET)
+    340            {
+    341            }   
+    342            while(SPI_I2S_GetFlagStatus(LCD_SD_SPI, SPI_I2S_FLAG_BSY) != RESET)
+    343            {
+    344            }  
+    345           
+    346            /* Return read Data */
+    347            return tmp;
+    348          }
+    349          
+    350          /**
+    351            * @brief  Initializes ADC, used to detect motion of Joystick available on 
+    352            *         adafruit 1.8" TFT shield.
+    353            * @param  None
+    354            * @retval None
+    355            */
+    356          void STM_ADC_Config(void)
+    357          {
+    358            GPIO_InitTypeDef      GPIO_InitStructure;
+    359            ADC_InitTypeDef       ADC_InitStructure;
+    360          
+    361            /* Enable the HSI oscillator */
+    362            RCC_HSICmd(ENABLE);
+    363            
+    364            /* Enable GPIO clock */
+    365            RCC_AHBPeriphClockCmd(ADC_GPIO_CLK, ENABLE);
+    366                
+    367            /* Configure ADCx Channel 8 as analog input */
+    368            GPIO_InitStructure.GPIO_Pin = ADC_GPIO_PIN ;
+    369            GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
+    370            GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+    371            GPIO_Init(ADC_GPIO_PORT, &GPIO_InitStructure);  
+    372          
+    373            /* Check that HSI oscillator is ready */
+    374            while(RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);
+    375            
+    376            /* Enable ADC clock */
+    377            RCC_APB2PeriphClockCmd(ADC_CLK, ENABLE);  
+    378             
+    379            /* Initialize ADC structure */
+    380            ADC_StructInit(&ADC_InitStructure);
+    381            
+    382            /* ADC1 configuration */
+    383            ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;  
+    384            ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+    385            ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
+    386            ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+    387            ADC_InitStructure.ADC_NbrOfConversion = 1;
+    388            ADC_Init(ADCx, &ADC_InitStructure);
+    389            
+    390            /* ADCx regular channel8 configuration */ 
+    391            ADC_RegularChannelConfig(ADCx, ADC_Channel_8, 1, ADC_SampleTime_16Cycles);
+    392             
+    393            /* Enable the ADC */
+    394            ADC_Cmd(ADCx, ENABLE);
+    395            
+    396            /* Wait until the ADC1 is ready */
+    397            while(ADC_GetFlagStatus(ADC1, ADC_FLAG_ADONS) == RESET)
+    398            {
+    399            }  
+    400            /* Start ADC Software Conversion */ 
+    401            ADC_SoftwareStartConv(ADCx); 
+    402          }
+    403          
+    404          /**
+    405            * @brief  Returns the Joystick key pressed.
+    406            * @note   To know which Joystick key is pressed we need to detect the voltage
+    407            *         level on each key output
+    408            *           - SEL   : 1.055 V / 1308
+    409            *           - RIGHT : 0.595 V / 737
+    410            *           - LEFT  : 3.0 V / 3720 
+    411            *           - UP    : 1.65 V / 2046
+    412            *           - DOWN  : 0.71 V / 88
+    413            *           - None  : 3.3 V / 4095
+    414            * @retval Code of the Joystick key pressed.
+    415            *          This code can be one of the following values:
+    416            *            @arg  JOY_NONE
+    417            *            @arg  JOY_SEL
+    418            *            @arg  JOY_DOWN
+    419            *            @arg  JOY_LEFT
+    420            *            @arg  JOY_RIGHT
+    421            *            @arg  JOY_UP  
+    422            */
+    423          JOYState_TypeDef STM_Get_JOYState(void)
+    424          {
+    425            JOYState_TypeDef state = JOY_NONE;
+    426            uint16_t  KeyConvertedValue = 0; 
+    427          
+    428            KeyConvertedValue = ADC_GetConversionValue(ADCx);
+    429            
+    430            if((KeyConvertedValue > 2010) && (KeyConvertedValue < 2090))
+    431            {
+    432              state = JOY_UP;
+    433            }
+    434            else if((KeyConvertedValue > 680) && (KeyConvertedValue < 780))
+    435            {
+    436              state = JOY_RIGHT;
+    437            }
+    438            else if((KeyConvertedValue > 1270) && (KeyConvertedValue < 1350))
+    439            {
+    440              state = JOY_SEL;
+    441            }
+    442            else if((KeyConvertedValue > 50) && (KeyConvertedValue < 130))
+    443            {
+    444              state = JOY_DOWN;
+    445            }
+    446            else if((KeyConvertedValue > 3680) && (KeyConvertedValue < 3760))
+    447            {
+    448              state = JOY_LEFT;
+    449            }
+    450            else
+    451            {
+    452              state = JOY_NONE;
+    453            }
+    454            /* Loop while a key is pressed */
+    455            if(state != JOY_NONE)
+    456            { 
+    457              while(KeyConvertedValue < 4000)
+    458              {
+    459                KeyConvertedValue = ADC_GetConversionValue(ADCx);
+    460              }      
+    461            }
+    462            /* Return the code of the Joystick key pressed*/
+    463            return state;
+    464          }
+    465          
+    466          /**
+    467            * @}
+    468            */ 
+    469          
+    470          /**
+    471            * @}
+    472            */ 
+    473          
+    474          /**
+    475            * @}
+    476            */ 
+    477          
+    478          /**
+    479            * @}
+    480            */   
+    481          
+    482          /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      16   LCD_CtrlLines_Config
+        16   -> GPIO_Init
+        16   -> RCC_AHBPeriphClockCmd
+      16   SD_CtrlLines_Config
+        16   -> GPIO_Init
+        16   -> RCC_AHBPeriphClockCmd
+      40   STM_ADC_Config
+        40   -> ADC_Cmd
+        40   -> ADC_GetFlagStatus
+        40   -> ADC_Init
+        40   -> ADC_RegularChannelConfig
+        40   -> ADC_SoftwareStartConv
+        40   -> ADC_StructInit
+        40   -> GPIO_Init
+        40   -> RCC_AHBPeriphClockCmd
+        40   -> RCC_APB2PeriphClockCmd
+        40   -> RCC_GetFlagStatus
+        40   -> RCC_HSICmd
+      16   STM_EVAL_LEDInit
+        16   -> GPIO_Init
+        16   -> RCC_AHBPeriphClockCmd
+       0   STM_EVAL_LEDOff
+       0   STM_EVAL_LEDOn
+       0   STM_EVAL_LEDToggle
+       8   STM_EVAL_PBGetState
+         8   -> GPIO_ReadInputDataBit
+      32   STM_EVAL_PBInit
+        32   -> EXTI_Init
+        32   -> GPIO_Init
+        32   -> NVIC_Init
+        32   -> RCC_AHBPeriphClockCmd
+        32   -> RCC_APB2PeriphClockCmd
+        32   -> SYSCFG_EXTILineConfig
+       8   STM_Get_JOYState
+         8   -> ADC_GetConversionValue
+      32   STM_SPI_Init
+        32   -> GPIO_Init
+        32   -> GPIO_PinAFConfig
+        32   -> RCC_AHBPeriphClockCmd
+        32   -> RCC_APB2PeriphClockCmd
+        32   -> SPI_Cmd
+        32   -> SPI_Init
+      16   STM_SPI_WriteRead
+        16   -> SPI_I2S_GetFlagStatus
+        16   -> SPI_I2S_ReceiveData
+        16   -> SPI_I2S_SendData
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable11
+       4  ??DataTable11_1
+       4  ??DataTable11_10
+       4  ??DataTable11_11
+       4  ??DataTable11_12
+       4  ??DataTable11_13
+       4  ??DataTable11_14
+       4  ??DataTable11_2
+       4  ??DataTable11_3
+       4  ??DataTable11_4
+       4  ??DataTable11_5
+       4  ??DataTable11_6
+       4  ??DataTable11_7
+       4  ??DataTable11_8
+       4  ??DataTable11_9
+       4  BUTTON_CLK
+       2  BUTTON_EXTI_LINE
+       1  BUTTON_IRQn
+       2  BUTTON_PIN
+       1  BUTTON_PIN_SOURCE
+       4  BUTTON_PORT
+       1  BUTTON_PORT_SOURCE
+       4  GPIO_CLK
+       2  GPIO_PIN
+       4  GPIO_PORT
+      70  LCD_CtrlLines_Config
+      56  SD_CtrlLines_Config
+     142  STM_ADC_Config
+      74  STM_EVAL_LEDInit
+      24  STM_EVAL_LEDOff
+      24  STM_EVAL_LEDOn
+      32  STM_EVAL_LEDToggle
+      24  STM_EVAL_PBGetState
+     160  STM_EVAL_PBInit
+     112  STM_Get_JOYState
+     190  STM_SPI_Init
+      80  STM_SPI_WriteRead
+
+ 
+     8 bytes in section .data
+    17 bytes in section .rodata
+ 1 048 bytes in section .text
+ 
+ 1 048 bytes of CODE  memory
+    17 bytes of CONST memory
+     8 bytes of DATA  memory
+
+Errors: none
+Warnings: none

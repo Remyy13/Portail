@@ -1,0 +1,635 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.30.3.8024/W32 for ARM        24/Nov/2014  11:34:27
+# Copyright 1999-2014 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_opamp.c
+#    Command line =  
+#        "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_opamp.c"
+#        -D USE_STDPERIPH_DRIVER -D STM32L1XX_XL -lcN "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\List\" -o "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Debug\Obj\" --no_cse --no_unroll
+#        --no_inline --no_code_motion --no_tbaa --no_clustering --no_scheduling
+#        --debug --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.0_2\arm\INC\c\DLib_Config_Normal.h" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Device\ST\STM32L1xx\Include\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\inc\"
+#        -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\"
+#        -I "D:\Mes Documents\ST32\Toolbox_TP1\Libraries\CMSIS\Include\" -I
+#        "D:\Mes Documents\ST32\Toolbox_TP1\" -I "D:\Mes
+#        Documents\ST32\Toolbox_TP1\Libraries\stm32l1xx_nucleo\" -Ol
+#    List file    =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\List\stm32l1xx_opamp.lst
+#    Object file  =  
+#        D:\Mes Documents\ST32\Toolbox_TP1\Debug\Obj\stm32l1xx_opamp.o
+#
+###############################################################################
+
+D:\Mes Documents\ST32\Toolbox_TP1\Libraries\STM32L1xx_StdPeriph_Driver\src\stm32l1xx_opamp.c
+      1          /**
+      2            ******************************************************************************
+      3            * @file    stm32l1xx_opamp.c
+      4            * @author  MCD Application Team
+      5            * @version V1.3.0
+      6            * @date    31-January-2014
+      7            * @brief   This file provides firmware functions to manage the following
+      8            *          functionalities of the operational amplifiers (opamp) peripheral:
+      9            *           + Initialization and configuration
+     10            *           + Calibration management
+     11            *          
+     12            *  @verbatim
+     13            ==============================================================================
+     14                                      ##### How to use this driver #####
+     15            ==============================================================================
+     16              [..] The device integrates three independent rail-to-rail operational amplifiers
+     17                   OPAMP1, OPAMP2 and OPAMP3:
+     18                         (+) Internal connections to the ADC.
+     19                         (+) Internal connections to the DAC.
+     20                         (+) Internal connection to COMP1 (only OPAMP3).
+     21                         (+) Internal connection for unity gain (voltage follower) configuration.
+     22                         (+) Calibration capability.
+     23                         (+) Selectable gain-bandwidth (2MHz in normal mode, 500KHz in low power mode).
+     24              [..]    
+     25                   (#) COMP AHB clock must be enabled to get write access
+     26                       to OPAMP registers using
+     27                   (#) RCC_APB1PeriphClockCmd(RCC_APB1Periph_COMP, ENABLE)
+     28            
+     29                   (#) Configure the corresponding GPIO to OPAMPx INP, OPAMPx_INN (if used)
+     30                       and OPAMPx_OUT in analog mode.
+     31             
+     32                   (#) Configure (close/open) the OPAMP switches using OPAMP_SwitchCmd()
+     33          
+     34                   (#) Enable the OPAMP peripheral using OPAMP_Cmd()
+     35          
+     36                   -@- In order to use OPAMP outputs as ADC inputs, the opamps must be enabled
+     37                       and the ADC must use the OPAMP output channel number:
+     38                       (+@) OPAMP1 output is connected to ADC channel 3.
+     39                       (+@) OPAMP2 output is connected to ADC channel 8.
+     40                       (+@) OPAMP3 output is connected to ADC channel 13 (SW1 switch must be closed).
+     41          
+     42            *  @endverbatim
+     43            *
+     44            ******************************************************************************
+     45            * @attention
+     46            *
+     47            * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+     48            *
+     49            * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+     50            * You may not use this file except in compliance with the License.
+     51            * You may obtain a copy of the License at:
+     52            *
+     53            *        http://www.st.com/software_license_agreement_liberty_v2
+     54            *
+     55            * Unless required by applicable law or agreed to in writing, software 
+     56            * distributed under the License is distributed on an "AS IS" BASIS, 
+     57            * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     58            * See the License for the specific language governing permissions and
+     59            * limitations under the License.
+     60            *
+     61            ******************************************************************************
+     62            */
+     63          
+     64          /* Includes ------------------------------------------------------------------*/
+     65          #include "stm32l1xx_opamp.h"
+     66          
+     67          
+     68          /** @addtogroup STM32L1xx_StdPeriph_Driver
+     69            * @{
+     70            */
+     71          
+     72          /** @defgroup OPAMP 
+     73            * @brief OPAMP driver modules
+     74            * @{
+     75            */ 
+     76          
+     77          /* Private typedef -----------------------------------------------------------*/
+     78          /* Private define ------------------------------------------------------------*/
+     79          /* Private macro -------------------------------------------------------------*/
+     80          /* Private variables ---------------------------------------------------------*/
+     81          /* Private function prototypes -----------------------------------------------*/
+     82          /* Private functions ---------------------------------------------------------*/
+     83          
+     84          /** @defgroup OPAMP_Private_Functions
+     85            * @{
+     86            */
+     87          
+     88          /** @defgroup OPAMP_Group1 Initialization and configuration
+     89           *  @brief   Initialization and configuration
+     90           *
+     91          @verbatim   
+     92           ===============================================================================
+     93                                      ##### Initialization and configuration #####
+     94           ===============================================================================
+     95          
+     96          @endverbatim
+     97            * @{
+     98            */  
+     99          
+    100          /**
+    101            * @brief  Deinitialize the OPAMPs register to its default reset value.
+    102            * @note   At startup, OTR and LPOTR registers are set to factory programmed values.
+    103            * @param  None.
+    104            * @retval None.
+    105            */
+    106          void OPAMP_DeInit(void)
+    107          {
+    108            /*!< Set OPAMP_CSR register to reset value */
+    109            OPAMP->CSR = 0x00010101;
+    110            /*!< Set OPAMP_OTR register to reset value */
+    111            OPAMP->OTR = (uint32_t)(* (uint32_t*)FLASH_R_BASE + 0x00000038);
+    112            /*!< Set OPAMP_LPOTR register to reset value */
+    113            OPAMP->LPOTR = (uint32_t)(* (uint32_t*)FLASH_R_BASE + 0x0000003C);
+    114          }
+    115          
+    116          /**
+    117            * @brief  Close or Open the OPAMP switches.
+    118            * @param  OPAMP_OPAMPxSwitchy: selects the OPAMPx switch.
+    119            *   This parameter can be any combinations of the following values:
+    120            *     @arg OPAMP_OPAMP1Switch3: used to connect internally OPAMP1 output to 
+    121            *                               OPAMP1 negative input (internal follower)
+    122            *     @arg OPAMP_OPAMP1Switch4: used to connect PA2 to OPAMP1 negative input
+    123            *     @arg OPAMP_OPAMP1Switch5: used to connect PA1 to OPAMP1 positive input
+    124            *     @arg OPAMP_OPAMP1Switch6: used to connect DAC_OUT1 to OPAMP1 positive input
+    125            *     @arg OPAMP_OPAMP1SwitchANA: used to meet 1 nA input leakage
+    126            *     @arg OPAMP_OPAMP2Switch3: used to connect internally OPAMP2 output to 
+    127            *                               OPAMP2 negative input (internal follower)
+    128            *     @arg OPAMP_OPAMP2Switch4: used to connect PA7 to OPAMP2 negative input
+    129            *     @arg OPAMP_OPAMP2Switch5: used to connect PA6 to OPAMP2 positive input
+    130            *     @arg OPAMP_OPAMP2Switch6: used to connect DAC_OUT1 to OPAMP2 positive input
+    131            *     @arg OPAMP_OPAMP2Switch7: used to connect DAC_OUT2 to OPAMP2 positive input
+    132            *     @arg OPAMP_OPAMP2SwitchANA: used to meet 1 nA input leakage
+    133            *     @arg OPAMP_OPAMP3Switch3: used to connect internally OPAMP3 output to 
+    134            *                               OPAMP3 negative input (internal follower)
+    135            *     @arg OPAMP_OPAMP3Switch4: used to connect PC2 to OPAMP3 negative input
+    136            *     @arg OPAMP_OPAMP3Switch5: used to connect PC1 to OPAMP3 positive input
+    137            *     @arg OPAMP_OPAMP3Switch6: used to connect DAC_OUT1 to OPAMP3 positive input
+    138            *     @arg OPAMP_OPAMP3SwitchANA: used to meet 1 nA input leakage on negative input
+    139            *
+    140            * @param  NewState: New state of the OPAMP switch. 
+    141            *   This parameter can be:
+    142            *     ENABLE to close the OPAMP switch
+    143            *     or DISABLE to open the OPAMP switch
+    144            * @note OPAMP_OPAMP2Switch6 and OPAMP_OPAMP2Switch7 mustn't be closed together.
+    145            * @retval None
+    146            */
+    147          void OPAMP_SwitchCmd(uint32_t OPAMP_OPAMPxSwitchy, FunctionalState NewState)
+    148          {
+    149            /* Check the parameter */
+    150            assert_param(IS_OPAMP_SWITCH(OPAMP_OPAMPxSwitchy));
+    151            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    152          
+    153            if (NewState != DISABLE)
+    154            {
+    155              /* Close the selected switches */
+    156              OPAMP->CSR |= (uint32_t) OPAMP_OPAMPxSwitchy;
+    157            }
+    158            else
+    159            {
+    160              /* Open the selected switches */
+    161              OPAMP->CSR &= (~(uint32_t)OPAMP_OPAMPxSwitchy);
+    162            }
+    163          }
+    164          
+    165          /**
+    166            * @brief  Enable or disable the OPAMP peripheral.
+    167            * @param  OPAMP_Selection: the selected OPAMP. 
+    168            *   This parameter can be one of the following values:
+    169            *     @arg OPAMP_Selection_OPAMP1: OPAMP1 is selected
+    170            *     @arg OPAMP_Selection_OPAMP2: OPAMP2 is selected
+    171            *     @arg OPAMP_Selection_OPAMP3: OPAMP3 is selected
+    172            * @param  NewState: new state of the selected OPAMP peripheral. 
+    173            *         This parameter can be: ENABLE or DISABLE.
+    174            * @retval None
+    175            */
+    176          void OPAMP_Cmd(uint32_t OPAMP_Selection, FunctionalState NewState)
+    177          {
+    178            /* Check the parameter */
+    179            assert_param(IS_OPAMP_ALL_PERIPH(OPAMP_Selection));
+    180            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    181          
+    182            if (NewState != DISABLE)
+    183            {
+    184              /* Enable the selected OPAMP */
+    185              OPAMP->CSR &= (~(uint32_t) OPAMP_Selection);
+    186            }
+    187            else
+    188            {
+    189              /* Disable the selected OPAMP */
+    190              OPAMP->CSR |= (uint32_t) OPAMP_Selection;
+    191            }
+    192          }
+    193          
+    194          /**
+    195            * @brief  Enable or disable the low power mode for OPAMP peripheral.
+    196            * @param  OPAMP_Selection: the selected OPAMP. 
+    197            *   This parameter can be one of the following values:
+    198            *     @arg OPAMP_Selection_OPAMP1: OPAMP1 selected
+    199            *     @arg OPAMP_Selection_OPAMP2: OPAMP2 selected
+    200            *     @arg OPAMP_Selection_OPAMP3: OPAMP3 selected
+    201            * @param  NewState: new low power state of the selected OPAMP peripheral.
+    202            *         This parameter can be: ENABLE or DISABLE.
+    203            * @retval None
+    204            */
+    205          void OPAMP_LowPowerCmd(uint32_t OPAMP_Selection, FunctionalState NewState)
+    206          {
+    207            /* Check the parameter */
+    208            assert_param(IS_OPAMP_ALL_PERIPH(OPAMP_Selection));
+    209            assert_param(IS_FUNCTIONAL_STATE(NewState));
+    210          
+    211            if (NewState != DISABLE)
+    212            {
+    213              /* Set the selected OPAMP in low power mode */
+    214              OPAMP->CSR |= (uint32_t) (OPAMP_Selection << 7);
+    215            }
+    216            else
+    217            {
+    218              /* Disable the low power mode for the selected OPAMP */
+    219              OPAMP->CSR &= (~(uint32_t) (OPAMP_Selection << 7));
+    220            }
+    221          }
+    222          
+    223          /**
+    224            * @brief  Select the OPAMP power range.
+    225            * @note   The OPAMP power range selection must be performed while OPAMPs are powered down.
+    226            * @param  OPAMP_Range: the selected OPAMP power range. 
+    227            *   This parameter can be one of the following values:
+    228            *     @arg OPAMP_PowerRange_Low: Low power range is selected (VDDA is lower than 2.4V).
+    229            *     @arg OPAMP_PowerRange_High: High power range is selected (VDDA is higher than 2.4V).
+    230            * @retval None
+    231            */
+    232          void OPAMP_PowerRangeSelect(uint32_t OPAMP_PowerRange)
+    233          {
+    234            /* Check the parameter */
+    235            assert_param(IS_OPAMP_RANGE(OPAMP_PowerRange));
+    236          
+    237            /* Reset the OPAMP range bit */
+    238            OPAMP->CSR &= (~(uint32_t) (OPAMP_CSR_AOP_RANGE));
+    239          
+    240            /* Select the OPAMP power range */
+    241            OPAMP->CSR |= OPAMP_PowerRange;
+    242          }
+    243          
+    244          /**
+    245            * @}
+    246            */
+    247          
+    248          /** @defgroup OPAMP_Group2 Calibration functions
+    249           *  @brief   Calibration functions
+    250           *
+    251          @verbatim   
+    252           ===============================================================================
+    253                                      ##### Calibration functions #####
+    254           ===============================================================================
+    255          
+    256          @endverbatim
+    257            * @{
+    258            */
+    259          
+    260          /**
+    261            * @brief  Select the trimming mode.
+    262            * @param  OffsetTrimming: the selected offset trimming mode. 
+    263            *   This parameter  can be one of the following values:
+    264            *     @arg OffsetTrimming_Factory: factory trimming values are used for offset
+    265            *                                  calibration.
+    266            *     @arg OffsetTrimming_User: user trimming values are used for offset
+    267            *                               calibration.
+    268            * @note When OffsetTrimming_User is selected, use OPAMP_OffsetTrimConfig()
+    269            *       function or OPAMP_OffsetTrimLowPowerConfig() function to adjust 
+    270            *       trimming value.
+    271            * @retval None
+    272            */
+    273          void OPAMP_OffsetTrimmingModeSelect(uint32_t OPAMP_Trimming)
+    274          {
+    275            /* Check the parameter */
+    276            assert_param(IS_OPAMP_TRIMMING(OPAMP_Trimming));
+    277          
+    278            /* Reset the OPAMP_OTR range bit */
+    279            OPAMP->OTR &= (~(uint32_t) (OPAMP_OTR_OT_USER));
+    280          
+    281            /* Select the OPAMP offset trimming  */
+    282            OPAMP->OTR |= OPAMP_Trimming;
+    283          
+    284          }
+    285          
+    286          /**
+    287            * @brief  Configure the trimming value of OPAMPs in normal mode.
+    288            * @param  OPAMP_Selection: the selected OPAMP. 
+    289            *   This parameter can be one of the following values:
+    290            *         @arg OPAMP_Selection_OPAMP1: OPAMP1 is selected to configure the trimming value.
+    291            *         @arg OPAMP_Selection_OPAMP2: OPAMP2 is selected to configure the trimming value.
+    292            *         @arg OPAMP_Selection_OPAMP3: OPAMP3 is selected to configure the trimming value.
+    293            * @param  OPAMP_Input: the selected OPAMP input. 
+    294            *   This parameter can be one of the following values:
+    295            *         @arg OPAMP_Input_NMOS: NMOS input is selected to configure the trimming value.
+    296            *         @arg OPAMP_Input_PMOS: PMOS input is selected to configure the trimming value.
+    297            * @param  OPAMP_TrimValue: the trimming value. This parameter can be any value lower
+    298            *         or equal to 0x0000001F. 
+    299            * @retval None
+    300            */
+    301          void OPAMP_OffsetTrimConfig(uint32_t OPAMP_Selection, uint32_t OPAMP_Input, uint32_t OPAMP_TrimValue)
+    302          {
+    303            uint32_t tmpreg = 0;
+    304          
+    305            /* Check the parameter */
+    306            assert_param(IS_OPAMP_ALL_PERIPH(OPAMP_Selection));
+    307            assert_param(IS_OPAMP_INPUT(OPAMP_Input));
+    308            assert_param(IS_OPAMP_TRIMMINGVALUE(OPAMP_TrimValue));
+    309          
+    310            /* Get the OPAMP_OTR value */
+    311            tmpreg = OPAMP->OTR;
+    312          
+    313            if(OPAMP_Selection == OPAMP_Selection_OPAMP1)
+    314            {
+    315              /* Reset the OPAMP inputs selection */
+    316              tmpreg &= (uint32_t)~(OPAMP_CSR_OPA1CAL_L | OPAMP_CSR_OPA1CAL_H);
+    317              /* Select the OPAMP input */
+    318              tmpreg |= OPAMP_Input;
+    319          
+    320              if(OPAMP_Input == OPAMP_Input_PMOS)
+    321              {
+    322                /* Reset the trimming value corresponding to OPAMP1 PMOS input */
+    323                tmpreg &= (0xFFFFFFE0);
+    324                /* Set the new trimming value corresponding to OPAMP1 PMOS input */
+    325                tmpreg |= (OPAMP_TrimValue);
+    326              }
+    327              else
+    328              {
+    329                /* Reset the trimming value corresponding to OPAMP1 NMOS input */
+    330                tmpreg &= (0xFFFFFC1F);
+    331                /* Set the new trimming value corresponding to OPAMP1 NMOS input */
+    332                tmpreg |= (OPAMP_TrimValue<<5);
+    333              }
+    334            }
+    335            else if (OPAMP_Selection == OPAMP_Selection_OPAMP2)
+    336            {
+    337              /* Reset the OPAMP inputs selection */
+    338              tmpreg &= (uint32_t)~(OPAMP_CSR_OPA2CAL_L | OPAMP_CSR_OPA2CAL_H);
+    339              /* Select the OPAMP input */
+    340              tmpreg |= (uint32_t)(OPAMP_Input<<8);
+    341          
+    342              if(OPAMP_Input == OPAMP_Input_PMOS)
+    343              {
+    344                /* Reset the trimming value corresponding to OPAMP2 PMOS input */
+    345                tmpreg &= (0xFFFF83FF);
+    346                /* Set the new trimming value corresponding to OPAMP2 PMOS input */
+    347                tmpreg |= (OPAMP_TrimValue<<10);
+    348              }
+    349              else
+    350              {
+    351                /* Reset the trimming value corresponding to OPAMP2 NMOS input */
+    352                tmpreg &= (0xFFF07FFF);
+    353                /* Set the new trimming value corresponding to OPAMP2 NMOS input */
+    354                tmpreg |= (OPAMP_TrimValue<<15);
+    355              }
+    356            }
+    357            else
+    358            {
+    359              /* Reset the OPAMP inputs selection */
+    360              tmpreg &= (uint32_t)~(OPAMP_CSR_OPA3CAL_L | OPAMP_CSR_OPA3CAL_H);
+    361              /* Select the OPAMP input */
+    362              tmpreg |= (uint32_t)(OPAMP_Input<<16);
+    363          
+    364              if(OPAMP_Input == OPAMP_Input_PMOS)
+    365              {
+    366                /* Reset the trimming value corresponding to OPAMP3 PMOS input */
+    367                tmpreg &= (0xFE0FFFFF);
+    368                /* Set the new trimming value corresponding to OPAMP3 PMOS input */
+    369                tmpreg |= (OPAMP_TrimValue<<20);
+    370              }
+    371              else
+    372              {
+    373                /* Reset the trimming value corresponding to OPAMP3 NMOS input */
+    374                tmpreg &= (0xC1FFFFFF);
+    375                /* Set the new trimming value corresponding to OPAMP3 NMOS input */
+    376                tmpreg |= (OPAMP_TrimValue<<25);
+    377              }
+    378            }
+    379          
+    380            /* Set the OPAMP_OTR register */
+    381            OPAMP->OTR = tmpreg;
+    382          }
+    383          
+    384          /**
+    385            * @brief  Configure the trimming value of OPAMPs in low power mode.
+    386            * @param  OPAMP_Selection: the selected OPAMP. 
+    387            *   This parameter can be one of the following values:
+    388            *         @arg OPAMP_Selection_OPAMP1: OPAMP1 is selected to configure the trimming value.
+    389            *         @arg OPAMP_Selection_OPAMP2: OPAMP2 is selected to configure the trimming value.
+    390            *         @arg OPAMP_Selection_OPAMP3: OPAMP3 is selected to configure the trimming value.
+    391            * @param  OPAMP_Input: the selected OPAMP input. 
+    392            *   This parameter can be one of the following values:
+    393            *         @arg OPAMP_Input_NMOS: NMOS input is selected to configure the trimming value.
+    394            *         @arg OPAMP_Input_PMOS: PMOS input is selected to configure the trimming value.
+    395            * @param  OPAMP_TrimValue: the trimming value. 
+    396            *    This parameter can be any value lower or equal to 0x0000001F. 
+    397            * @retval None
+    398            */
+    399          void OPAMP_OffsetTrimLowPowerConfig(uint32_t OPAMP_Selection, uint32_t OPAMP_Input, uint32_t OPAMP_TrimValue)
+    400          {
+    401            uint32_t tmpreg = 0;
+    402          
+    403            /* Check the parameter */
+    404            assert_param(IS_OPAMP_ALL_PERIPH(OPAMP_Selection));
+    405            assert_param(IS_OPAMP_INPUT(OPAMP_Input));
+    406            assert_param(IS_OPAMP_TRIMMINGVALUE(OPAMP_TrimValue));
+    407          
+    408            /* Get the OPAMP_LPOTR value */
+    409            tmpreg = OPAMP->LPOTR;
+    410          
+    411            if(OPAMP_Selection == OPAMP_Selection_OPAMP1)
+    412            {
+    413              /* Reset the OPAMP inputs selection */
+    414              tmpreg &= (uint32_t)~(OPAMP_CSR_OPA1CAL_L | OPAMP_CSR_OPA1CAL_H);
+    415              /* Select the OPAMP input */
+    416              tmpreg |= OPAMP_Input;
+    417          
+    418              if(OPAMP_Input == OPAMP_Input_PMOS)
+    419              {
+    420                /* Reset the trimming value corresponding to OPAMP1 PMOS input */
+    421                tmpreg &= (0xFFFFFFE0);
+    422                /* Set the new trimming value corresponding to OPAMP1 PMOS input */
+    423                tmpreg |= (OPAMP_TrimValue);
+    424              }
+    425              else
+    426              {
+    427                /* Reset the trimming value corresponding to OPAMP1 NMOS input */
+    428                tmpreg &= (0xFFFFFC1F);
+    429                /* Set the new trimming value corresponding to OPAMP1 NMOS input */
+    430                tmpreg |= (OPAMP_TrimValue<<5);
+    431              }
+    432            }
+    433            else if (OPAMP_Selection == OPAMP_Selection_OPAMP2)
+    434            {
+    435              /* Reset the OPAMP inputs selection */
+    436              tmpreg &= (uint32_t)~(OPAMP_CSR_OPA2CAL_L | OPAMP_CSR_OPA2CAL_H);
+    437              /* Select the OPAMP input */
+    438              tmpreg |= (uint32_t)(OPAMP_Input<<8);
+    439          
+    440              if(OPAMP_Input == OPAMP_Input_PMOS)
+    441              {
+    442                /* Reset the trimming value corresponding to OPAMP2 PMOS input */
+    443                tmpreg &= (0xFFFF83FF);
+    444                /* Set the new trimming value corresponding to OPAMP2 PMOS input */
+    445                tmpreg |= (OPAMP_TrimValue<<10);
+    446              }
+    447              else
+    448              {
+    449                /* Reset the trimming value corresponding to OPAMP2 NMOS input */
+    450                tmpreg &= (0xFFF07FFF);
+    451                /* Set the new trimming value corresponding to OPAMP2 NMOS input */
+    452                tmpreg |= (OPAMP_TrimValue<<15);
+    453              }
+    454            }
+    455            else
+    456            {
+    457              /* Reset the OPAMP inputs selection */
+    458              tmpreg &= (uint32_t)~(OPAMP_CSR_OPA3CAL_L | OPAMP_CSR_OPA3CAL_H);
+    459              /* Select the OPAMP input */
+    460              tmpreg |= (uint32_t)(OPAMP_Input<<16);
+    461          
+    462              if(OPAMP_Input == OPAMP_Input_PMOS)
+    463              {
+    464                /* Reset the trimming value corresponding to OPAMP3 PMOS input */
+    465                tmpreg &= (0xFE0FFFFF);
+    466                /* Set the new trimming value corresponding to OPAMP3 PMOS input */
+    467                tmpreg |= (OPAMP_TrimValue<<20);
+    468              }
+    469              else
+    470              {
+    471                /* Reset the trimming value corresponding to OPAMP3 NMOS input */
+    472                tmpreg &= (0xC1FFFFFF);
+    473                /* Set the new trimming value corresponding to OPAMP3 NMOS input */
+    474                tmpreg |= (OPAMP_TrimValue<<25);
+    475              }
+    476            }
+    477          
+    478            /* Set the OPAMP_LPOTR register */
+    479            OPAMP->LPOTR = tmpreg;
+    480          }
+    481          
+    482          /**
+    483            * @brief  Checks whether the specified OPAMP calibration flag is set or not.
+    484            * @note   User should wait until calibration flag change the value when changing
+    485            *         the trimming value.
+    486            * @param  OPAMP_Selection: the selected OPAMP. 
+    487            *   This parameter can be one of the following values:
+    488            *     @arg OPAMP_Selection_OPAMP1: OPAMP1 is selected.
+    489            *     @arg OPAMP_Selection_OPAMP2: OPAMP2 is selected.
+    490            *     @arg OPAMP_Selection_OPAMP3: OPAMP3 is selected.
+    491            * @retval The new state of the OPAMP calibration flag (SET or RESET).
+    492            */
+    493          FlagStatus OPAMP_GetFlagStatus(uint32_t OPAMP_Selection)
+    494          {
+    495            FlagStatus bitstatus = RESET;
+    496            uint32_t tmpreg = 0;
+    497          
+    498            /* Check the parameter */
+    499            assert_param(IS_OPAMP_ALL_PERIPH(OPAMP_Selection));
+    500            
+    501            /* Get the CSR register value */
+    502            tmpreg = OPAMP->CSR;
+    503          
+    504            /* Check if OPAMP1 is selected */
+    505            if(OPAMP_Selection == OPAMP_Selection_OPAMP1)
+    506            {
+    507              /* Check OPAMP1 CAL bit status */
+    508              if ((tmpreg & OPAMP_CSR_OPA1CALOUT) != (uint32_t)RESET)
+    509              {
+    510                bitstatus = SET;
+    511              }
+    512              else
+    513              {
+    514                bitstatus = RESET;
+    515              }
+    516            }
+    517            /* Check if OPAMP2 is selected */
+    518            else if(OPAMP_Selection == OPAMP_Selection_OPAMP2)
+    519            {
+    520              /* Check OPAMP2 CAL bit status */
+    521              if ((tmpreg & OPAMP_CSR_OPA2CALOUT) != (uint32_t)RESET)
+    522              {
+    523                bitstatus = SET;
+    524              } 
+    525              else
+    526              {
+    527                bitstatus = RESET;
+    528              }
+    529            }
+    530            else
+    531            {
+    532              /* Check OPAMP3 CAL bit status */
+    533              if ((tmpreg & OPAMP_CSR_OPA3CALOUT) != (uint32_t)RESET)
+    534              {
+    535                bitstatus = SET;
+    536              }
+    537              else
+    538              {
+    539                bitstatus = RESET;
+    540              }
+    541            }
+    542            return bitstatus;
+    543          }
+    544          
+    545          /**
+    546            * @}
+    547            */
+    548          
+    549          /**
+    550            * @}
+    551            */
+    552          
+    553          /**
+    554            * @}
+    555            */
+    556          
+    557          /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   OPAMP_Cmd
+       0   OPAMP_DeInit
+       0   OPAMP_GetFlagStatus
+       0   OPAMP_LowPowerCmd
+       0   OPAMP_OffsetTrimConfig
+       0   OPAMP_OffsetTrimLowPowerConfig
+       0   OPAMP_OffsetTrimmingModeSelect
+       0   OPAMP_PowerRangeSelect
+       0   OPAMP_SwitchCmd
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable8
+       4  ??DataTable8_1
+       4  ??DataTable8_2
+       4  ??DataTable8_3
+       4  ??DataTable8_4
+      32  OPAMP_Cmd
+      28  OPAMP_DeInit
+      58  OPAMP_GetFlagStatus
+      34  OPAMP_LowPowerCmd
+     112  OPAMP_OffsetTrimConfig
+     112  OPAMP_OffsetTrimLowPowerConfig
+      24  OPAMP_OffsetTrimmingModeSelect
+      24  OPAMP_PowerRangeSelect
+      32  OPAMP_SwitchCmd
+
+ 
+ 476 bytes in section .text
+ 
+ 476 bytes of CODE memory
+
+Errors: none
+Warnings: none
