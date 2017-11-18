@@ -6,15 +6,13 @@
 
 "-p" 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm\CONFIG\debugger\ST\STM32L152ZE.ddf" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.4\arm\CONFIG\debugger\ST\STM32L152ZE.ddf" 
 
 "--drv_verify_download" 
 
 "--semihosting" 
 
 "--device=STM32L152ZE" 
-
-"--drv_debug_ap=0" 
 
 "--drv_interface=SWD" 
 
