@@ -1,4 +1,4 @@
-"D:\Projet\3e annee\Systeme embarqué\Portail\Toolbox_TP1\main.c"
+"D:\Projet\3e annee\Systeme embarqué\Portail\Toolbox_TP1\initialisation.c"
 -std=c11
 -ferror-limit=0
 -I
