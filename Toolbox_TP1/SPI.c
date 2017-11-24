@@ -5,7 +5,7 @@
 /* 
 ********initialisation du module SPI1********
 
-fonctions :  void GPIO_init_SPI1()
+fonctions :     void GPIO_init_SPI1()
                 void Set_CS()
                 void Reset_CS()
                 void SendData_SPI(uint8_t data)
