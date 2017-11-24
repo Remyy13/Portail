@@ -12,7 +12,7 @@ fonctions :     void GPIO_init_USART2()
 */
 
 
-
+/*
 
 GPIO_init_USART2(){ 
   
@@ -84,7 +84,7 @@ void uart2_config(void)
   
 }
 
-
+*/
 
 /*void main()
 { 

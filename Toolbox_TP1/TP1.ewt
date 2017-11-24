@@ -2575,13 +2575,7 @@
         <name>$PROJ_DIR$\modules\Bouton_poussoir.c</name>
     </file>
     <file>
-        <name>$PROJ_DIR$\fonction.h</name>
-    </file>
-    <file>
         <name>$PROJ_DIR$\modules\I2C.c</name>
-    </file>
-    <file>
-        <name>$PROJ_DIR$\initialisation.c</name>
     </file>
     <file>
         <name>$PROJ_DIR$\modules\LED.c</name>
