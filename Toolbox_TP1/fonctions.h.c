@@ -25,7 +25,7 @@
 
 
 #include "stm32l1xx_nucleo.h"
-#include "fonctions.h"
+#include "fonction.h"
 
 
 // On commence par initialiser les différents composants de la carte :
