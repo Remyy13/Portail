@@ -2572,15 +2572,33 @@
         </group>
     </group>
     <file>
+        <name>$PROJ_DIR$\modules\Bouton_poussoir.c</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\fonction.h</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\modules\I2C.c</name>
     </file>
     <file>
         <name>$PROJ_DIR$\initialisation.c</name>
     </file>
     <file>
+        <name>$PROJ_DIR$\modules\LED.c</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\main.c</name>
     </file>
     <file>
+        <name>$PROJ_DIR$\modules\PWM.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\modules\SPI.c</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\stm32l1xx_it.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\modules\USART.c</name>
     </file>
 </project>
