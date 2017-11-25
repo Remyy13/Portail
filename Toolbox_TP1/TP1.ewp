@@ -2238,6 +2238,9 @@
         <name>$PROJ_DIR$\modules\Bouton_poussoir.c</name>
     </file>
     <file>
+        <name>$PROJ_DIR$\modules\fonctions.h</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\modules\I2C.c</name>
     </file>
     <file>

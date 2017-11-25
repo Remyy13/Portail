@@ -1,4 +1,5 @@
 #include "stm32l1xx_nucleo.h"
+#include "fonctions.h"
 
 
 
@@ -12,9 +13,9 @@ fonctions :     void GPIO_init_USART2()
 */
 
 
-/*
 
-GPIO_init_USART2(){ 
+
+void GPIO_init_USART2(){ 
   
     RCC   -> AHBENR |= RCC_AHBENR_GPIOAEN; //envoyé l'horloge sur Registre Port A
     GPIOA -> MODER &= ~GPIO_MODER_MODER2_0; //Bit 0 du port A à etat 1
@@ -64,7 +65,13 @@ void uart_rx() {
      USART2 ->CR1 |= USART_CR1_RE;
      
      while ((USART2 ->SR & USART_SR_RXNE)==0);
+     val= USART2->DR;
      
+    USART2 ->CR1 |= USART_CR1_TE;  
+    USART2 -> DR = USART2->DR;
+    
+    while( (USART2 ->SR & USART_SR_TC)==0);
+    USART2 ->SR &= ~USART_SR_TC ;
      
   
 }
@@ -84,7 +91,7 @@ void uart2_config(void)
   
 }
 
-*/
+
 
 /*void main()
 { 
@@ -98,4 +105,5 @@ void uart2_config(void)
       uart_tx();
                   
     } 
-}*/
+}
+*/

@@ -25,7 +25,7 @@
 
 
 #include "stm32l1xx_nucleo.h"
-#include "fonctions.h"
+#include "modules/fonctions.h"
 
 
 // On commence par initialiser les différents composants de la carte :
@@ -66,12 +66,14 @@
 
 void main()
 {
-
+GPIO_init_USART2();
+     uart2_config();
   
   while(1)
   {
-    
-    init_gpio();
+  
+     uart_rx();
+   // init_gpio();
     // Je lis mon capteur 
         // S'il y a quelqu'un => je dois ouvrir
                 //  Si la donnée capteur > valeur seuil  et que le portail est fermé alors j'actionne mon moteur pour ouvrir et mes leds doivent clignoter et le buzzer doit sonner et l'afficheur doit afficher OPENING
