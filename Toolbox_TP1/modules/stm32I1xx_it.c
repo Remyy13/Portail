@@ -45,32 +45,16 @@
   
 void EXTI15_10_IRQHandler()    //car PA11 et PA12
 {
-    if(EXTI->PR & (1<<11))
+    if(EXTI->PR & (EXTI_PR_PR11))
     {
-      EXTI->PR |= (1<<11); // cours 2 slide 26 (esce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
+      EXTI->PR |= (EXTI_PR_PR11); // cours 2 slide 26 (esce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
       etat=~etat;//p26
     }
     
-    if(EXTI->PR & (1<<12))
+    if(EXTI->PR & (EXTI_PR_PR12))
     {
-      EXTI->PR |= (1<<12); // cours 2 slide 26 (esce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
+      EXTI->PR |= (EXTI_PR_PR12); // cours 2 slide 26 (esce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
       etat1=~etat1;//p26
-    }
-    
-}
-
-void EXTI9_5_IRQHandler() //(dans fichier startup) car PC5 et PC6
-{
-    if(EXTI->PR & (1<<6))
-    {
-      EXTI->PR |= (1<<6); // cours 2 slide 26 (esce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
-      etat2=~etat2;//p26
-    }
-    
-    if(EXTI->PR & (1<<5))
-    {
-      EXTI->PR |= (1<<5); // cours 2 slide 26 (esce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
-      etat3=~etat3;//p26
     }
     
 }
