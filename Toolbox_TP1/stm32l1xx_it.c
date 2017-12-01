@@ -29,7 +29,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l1xx_it.h"
+#include "modules/fonctions.h"
 
+  extern uint8_t etat;
+  extern uint8_t etat1;
+  char Message_to_TX;
 
 /** @addtogroup Template_Project
   * @{
@@ -160,7 +164,26 @@ void SysTick_Handler(void)
 {
 }*/
 
-
+  
+  
+  
+void EXTI15_10_IRQHandler()    //car PA11 et PA12
+{
+    if(EXTI->PR & (EXTI_PR_PR11))
+    {
+      Message_to_TX='O';
+      uart_tx(Message_to_TX);
+      EXTI->PR |= (EXTI_PR_PR11); // cours 2 slide 26 (est ce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
+      etat=~etat;//p26
+    }
+    
+    if(EXTI->PR & (EXTI_PR_PR12))
+    {
+      EXTI->PR |= (EXTI_PR_PR12); // cours 2 slide 26 (est ce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
+      etat1=~etat1;//p26
+    }
+    
+}
 
 
 

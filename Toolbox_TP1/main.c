@@ -25,7 +25,7 @@
 
 
 #include "stm32l1xx_nucleo.h"
-#include "fonctions.h"
+#include "modules/fonctions.h"
 
 
 // On commence par initialiser les différents composants de la carte :
@@ -54,24 +54,50 @@
 
 
 
-
-
-
-// 
+  uint8_t etat;
+  uint8_t etat1;
 
 
 
 
-
+void wait(uint32_t tmp)
+{
+  uint32_t i;
+  for (i =0; i<tmp; i++);
+}
 
 void main()
 {
 
+GPIO_init_USART2();
+     uart2_config();
+  
+     
+  init_led();                   // On lance le programme d'initialisation des leds
+  enable_interrupt_ext();       // On active les interruptions externe
+  init_gpio_bouton_poussoir();                    // On lance le programme d'initialisation des boutons poussoirs
+
+  /* int index;*/
+
+  
+  GPIOB->ODR &= ~ ((GPIO_ODR_ODR_1) | (GPIO_ODR_ODR_2));     // Led eteinte sous la mise sous tension Cours 1 Slide 43 On active le registre en OUTPUT
+
+  etat =0;
+  etat1 =0;
+
+
+
   
   while(1)
   {
+    if((GPIOA->IDR & (GPIO_IDR_IDR_11)) == 0)      /* when the BP is pushed (pull down) the state variable is checked */
+    {
     
-    init_gpio();
+    }
+    uart_rx();
+     // uart_rx();
+       /* Program Scrutation */
+
     // Je lis mon capteur 
         // S'il y a quelqu'un => je dois ouvrir
                 //  Si la donnée capteur > valeur seuil  et que le portail est fermé alors j'actionne mon moteur pour ouvrir et mes leds doivent clignoter et le buzzer doit sonner et l'afficheur doit afficher OPENING
