@@ -60,3 +60,20 @@ void Delay (uint32_t Tempo);
 
 uint8_t convertion_char_LCD(uint8_t CHAR);
 void SPI_Write_chaine_carac(uint8_t* chaine);
+
+
+// PWM = Servo mot 1
+
+void init_GPIO_TIM4(uint16_t dutycycle) ;      // Initialisation du TIM3 pour faire sonner le Buzzer, le MiniMoteur et les servo moteurs
+void init_PWM_BUZZ(void);       // Initialisation du PWM pour faire sonner le Buzzer sur le TIM3_CH2 sur PC7
+void init_BUZZER(void);         // Initialisation pour faire sonner le Buzzer
+void wait(uint32_t tmp);        // Fonction Attendre (pour créer les secondes)
+void init_PWM_MINIMOT(void);    // Initialisation du PWM pour faire tourner le MiniMot sur le TIM3_CH1 sur PB4
+void init_minimot(void);        // Initialisation pour faire tourner le MiniMot
+void init_PWM_MOT1(void);       // Initialisation du PWM pour faire tourner le Servo Moteur 1 sur le TIM4_CH3 sur PB8
+void init_MOT1(void);           // Initialisation pour faire tourner le Servo Moteur 1
+void init_PWM_MOT2(void);       // Initialisation du PWM pour faire tourner le Servo Moteur 2 sur le TIM4_CH4 sur PB9
+void init_MOT2(void);           // Initialisation pour faire tourner le Servo Moteur 2
+
+void init_tim3(void);
+void open_gate (void);
