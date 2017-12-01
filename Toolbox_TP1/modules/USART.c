@@ -68,6 +68,7 @@ void uart_rx() {
      Message= USART2->DR;
      if (Message == 'O'){
       SPI_Write_chaine_carac("OPENING");
+      open_gate();
        clignotement_LED();
      }
 
