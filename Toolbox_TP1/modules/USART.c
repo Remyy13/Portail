@@ -48,31 +48,34 @@ void GPIO_init_USART2(){
 
 
 
-void uart_tx() {
+void uart_tx(char Message) {
   
     USART2 ->CR1 |= USART_CR1_TE;  
-    USART2 -> DR = 'A';
+    USART2 -> DR = Message;
     
     while( (USART2 ->SR & USART_SR_TC)==0);
     USART2 ->SR &= ~USART_SR_TC ; 
+    
+
   
 }
 
-
 void uart_rx() {
-
-     uint8_t val;
+    char Message;
      USART2 ->CR1 |= USART_CR1_RE;
      
      while ((USART2 ->SR & USART_SR_RXNE)==0);
-     val= USART2->DR;
-     
-    USART2 ->CR1 |= USART_CR1_TE;  
-    USART2 -> DR = USART2->DR;
-    
-    while( (USART2 ->SR & USART_SR_TC)==0);
-    USART2 ->SR &= ~USART_SR_TC ;
-     
+     Message= USART2->DR;
+     if (Message == 'O'){
+       
+     led ();
+     }
+     else 
+     {
+       led_eteinte();
+       
+     }
+
   
 }
 void uart2_config(void)
@@ -90,20 +93,3 @@ void uart2_config(void)
    
   
 }
-
-
-
-/*void main()
-{ 
- 
-     GPIO_init_USART2();
-     uart2_config();
-     
-    while(1)
-    {
-
-      uart_tx();
-                  
-    } 
-}
-*/

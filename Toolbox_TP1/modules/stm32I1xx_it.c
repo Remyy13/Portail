@@ -38,8 +38,6 @@
    
   extern uint8_t etat;
   extern uint8_t etat1;
-  extern uint8_t etat2;
-  extern uint8_t etat3;
   
   
   
@@ -47,6 +45,7 @@ void EXTI15_10_IRQHandler()    //car PA11 et PA12
 {
     if(EXTI->PR & (EXTI_PR_PR11))
     {
+      uart_tx();
       EXTI->PR |= (EXTI_PR_PR11); // cours 2 slide 26 (esce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
       etat=~etat;//p26
     }
