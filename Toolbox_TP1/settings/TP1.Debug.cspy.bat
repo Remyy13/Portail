@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.4\common\bin\cspybat" -f "D:\Mes Documents\GitHub\Portail\Toolbox_TP1\settings\TP1.Debug.general.xcl" --backend -f "D:\Mes Documents\GitHub\Portail\Toolbox_TP1\settings\TP1.Debug.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "D:\Projet\3e annee\Systeme embarqué\Portail\Toolbox_TP1\settings\TP1.Debug.general.xcl" --backend -f "D:\Projet\3e annee\Systeme embarqué\Portail\Toolbox_TP1\settings\TP1.Debug.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.4\common\bin\cspybat" -f "D:\Mes Documents\GitHub\Portail\Toolbox_TP1\settings\TP1.Debug.general.xcl" "--debug_file=%~1" --backend -f "D:\Mes Documents\GitHub\Portail\Toolbox_TP1\settings\TP1.Debug.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "D:\Projet\3e annee\Systeme embarqué\Portail\Toolbox_TP1\settings\TP1.Debug.general.xcl" "--debug_file=%~1" --backend -f "D:\Projet\3e annee\Systeme embarqué\Portail\Toolbox_TP1\settings\TP1.Debug.driver.xcl" 
 
 @echo off 
 :end
