@@ -30,10 +30,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l1xx_it.h"
 #include "modules/fonctions.h"
-
-  extern uint8_t etat;
-  extern uint8_t etat1;
-  char Message_to_TX;
+extern uint8_t etat;
+extern uint8_t etat1;
+extern uint8_t etat2;
+extern uint8_t etat3;
+extern uint8_t etat4;
+extern uint8_t etat5,CPT_sec,CPT_mn,CPT_heure;
+char Message_to_TX;
 
 /** @addtogroup Template_Project
   * @{
@@ -167,24 +170,48 @@ void SysTick_Handler(void)
   
   
   
-void EXTI15_10_IRQHandler()    //car PA11 et PA12
+void EXTI15_10_IRQHandler ()    //(dans fichier startup)
 {
-    if(EXTI->PR & (EXTI_PR_PR11))
+if(EXTI->PR &(1<<11))
+  {
+  EXTI->PR |= (1<<11);  // bit11 à 1 pour la prochaine interruption  pour remettre à 0 -  p26 Interrupt
+  etat1 = ~etat1;
+  
+  }
+  if(EXTI->PR &(1<<12))
+  {
+  EXTI->PR |= (1<<12);  // bit12 à 1 pour la prochaine interruption  pour remettre à 0 -  p26 Interrupt
+  etat2 = ~etat2;
+  }
+  if(EXTI->PR & (EXTI_PR_PR11))
     {
-      Message_to_TX='I';
+      Message_to_TX='O';
       uart_tx(Message_to_TX);
-      EXTI->PR |= (EXTI_PR_PR11); // cours 2 slide 26 (est ce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
+      EXTI->PR |= (EXTI_PR_PR11); // cours 2 slide 26 (est ce que j'ai recu une demande d'interruption //  on le met ? 1 pour faire un reset
       etat=~etat;//p26
     }
-    
-    if(EXTI->PR & (EXTI_PR_PR12))
-    {
-      EXTI->PR |= (EXTI_PR_PR12); // cours 2 slide 26 (est ce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
-      etat1=~etat1;//p26
-    }
-    
 }
 
+void EXTI9_5_IRQHandler ()    //(dans fichier startup)
+{
+if(EXTI->PR &(1<<6))
+  {
+  EXTI->PR |= (1<<6);  // bit6 à 1 pour la prochaine interruption  pour remettre à 0 -  p26 Interrupt
+  etat4 = ~etat4;
+  }
+  if(EXTI->PR &(1<<5))
+  {
+  EXTI->PR |= (1<<5);  // bit6 à 1 pour la prochaine interruption  pour remettre à 0 -  p26 Interrupt
+  etat3 = ~etat3;
+  }
+}
+
+void TIM2_IRQHandler ()
+{
+
+TIM2->SR &= ~(1<<0);
+etat5=~etat5;  
+}
 
 
 
