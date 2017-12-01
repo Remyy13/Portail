@@ -53,13 +53,10 @@
 
 
 //Variables
-
-//uint8_t etat;
-
-
- uint8_t etat;
-  uint8_t etat_interuption;
-
+uint8_t etat;
+uint8_t etat_interuption;
+  
+// Temporisation
 void wait(uint32_t tmp)
 {
   uint32_t i;
@@ -69,50 +66,49 @@ void wait(uint32_t tmp)
 void main()
 {
 
+ // Init PWM & timer
+// init_GPIO_TIM4(dutycycle);
+init_PWM_BUZZ(); 
+init_BUZZER();
+init_PWM_MINIMOT();
+init_minimot();
+init_MOT1();
+init_PWM_MOT1();
+// init_PWM_MOT2();
+// init_MOT2();
+init_tim3();
 
-//GPIO_init_USART2();
-     //uart2_config();
-  
-     
-  //enable_interrupt_ext();       // On active les interruptions externe
-  //init_gpio_bouton_poussoir();                    // On lance le programme d'initialisation des boutons poussoirs
-
+// init UART2
 GPIO_init_USART2();
-uart2_config();   
+uart2_config(); 
+
+// init LED
 Init_Led();                   // On lance le programme d'initialisation des leds
+
+// init Interruption
 enable_interrupt_ext();       // On active les interruptions externe
+
+// init boutons poussoirs
 init_gpio_bouton_poussoir();                    // On lance le programme d'initialisation des boutons poussoirs
 
-
-  /* int index;*/
- 
-GPIOB->ODR &= ~ ((GPIO_ODR_ODR_1) | (GPIO_ODR_ODR_2));     // Led eteinte sous la mise sous tension Cours 1 Slide 43 On active le registre en OUTPUT
-
+// init SPI
 etat =0;
 etat_interuption =0;
 init_SPI();
 init_MAX();
 init_TIM2();
-enable_interrupt_ext();
-  
 
-  
-init_SPI();
-init_MAX();
-init_TIM2();
-enable_interrupt_ext();
   
 SPI_Write(0x09,0x00); // code B decode desactivé
 
   while(1)
   {
  
-    
     if((GPIOA->IDR & (GPIO_IDR_IDR_11)) == 0)      /* when the BP is pushed (pull down) the state variable is checked */
     {
     
     }
-    uart_rx();
+    uart_rx(); // For testing transmission uart receive
      // uart_rx();
        /* Program Scrutation */
 

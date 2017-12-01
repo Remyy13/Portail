@@ -2584,6 +2584,9 @@
         <name>$PROJ_DIR$\main.c</name>
     </file>
     <file>
+        <name>$PROJ_DIR$\modules\PWM.c</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\modules\SPI.c</name>
     </file>
     <file>

@@ -11,11 +11,66 @@
 /******************************************************************************/
 
 #include "stm32l1xx_nucleo.h"
-#include "modules/fonctions.h"
+
+// Déclarations des fonctions
+void init_GPIO_TIM4(uint16_t dutycycle) ;      // Initialisation du TIM3 pour faire sonner le Buzzer, le MiniMoteur et les servo moteurs
+void init_PWM_BUZZ(void);       // Initialisation du PWM pour faire sonner le Buzzer sur le TIM3_CH2 sur PC7
+void init_BUZZER(void);         // Initialisation pour faire sonner le Buzzer
+void wait(uint32_t tmp);        // Fonction Attendre (pour créer les secondes)
+void init_PWM_MINIMOT(void);    // Initialisation du PWM pour faire tourner le MiniMot sur le TIM3_CH1 sur PB4
+void init_minimot(void);        // Initialisation pour faire tourner le MiniMot
+void init_PWM_MOT1(void);       // Initialisation du PWM pour faire tourner le Servo Moteur 1 sur le TIM4_CH3 sur PB8
+void init_MOT1(void);           // Initialisation pour faire tourner le Servo Moteur 1
+void init_PWM_MOT2(void);       // Initialisation du PWM pour faire tourner le Servo Moteur 2 sur le TIM4_CH4 sur PB9
+void init_MOT2(void);           // Initialisation pour faire tourner le Servo Moteur 2
+
+void init_tim3(void);
+void open_gate (void);
 
 
 
+void main()
+{ 
+  // Initialisation Programme
+ // init_GPIO_TIM4(dutycycle);
+  init_PWM_BUZZ(); 
+  init_BUZZER();
+  init_PWM_MINIMOT();
+  init_minimot();
+  init_MOT1();
+  init_PWM_MOT1();
+ // init_PWM_MOT2();
+ // init_MOT2();
+  init_tim3();
+  open_gate ();
 
+
+ /*
+   init_GPIO_TIM4(500);     
+   TIM4->CR1|= TIM_CR1_CEN ;                        // On active le compteur 
+   wait(4000000); 
+   TIM4->CR1 &= ~ TIM_CR1_CEN ; 
+
+   init_GPIO_TIM4(2000);     
+   TIM4->CR1|= TIM_CR1_CEN ;                        // On active le compteur 
+   wait(4000000); 
+   TIM4->CR1 &= ~ TIM_CR1_CEN ; 
+  */
+  
+  // Partie Fonctionnelle
+  while(1)
+  {        
+
+  }                                   // fin du WHILE
+}                                     // fin  du Main
+
+/*
+void wait(uint32_t tmp)                                   // Fonction Attendre (pour créer les secondes)
+{
+   uint32_t i = 0;
+   for(i = 0; i < tmp; i++);
+}
+*/
 // Début de la configuration du Timer3
 
 void init_GPIO_TIM4(uint16_t dutycycle)                                 // Initialisation du TIM4 pour utiliser les servo moteurs

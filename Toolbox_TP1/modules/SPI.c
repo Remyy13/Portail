@@ -1,7 +1,6 @@
 #include "stm32l1xx_nucleo.h"
 #include "modules/fonctions.h"
 
-#include "stm32l1xx_nucleo.h"
 
 #define addr_w 0x9E
 #define addr_r 0x9F

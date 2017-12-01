@@ -14,7 +14,7 @@ fonctions :     void GPIO_init_USART2()
 
 
 
-
+// Init des ports & pin GPIO
 void GPIO_init_USART2(){ 
   
     RCC   -> AHBENR |= RCC_AHBENR_GPIOAEN; //envoyé l'horloge sur Registre Port A
@@ -47,7 +47,7 @@ void GPIO_init_USART2(){
 }
 
 
-
+// Emission d'un message 
 void uart_tx(char Message) {
   
     USART2 ->CR1 |= USART_CR1_TE;  
@@ -60,6 +60,8 @@ void uart_tx(char Message) {
   
 }
 
+
+// Reception d'un message
 void uart_rx() {
     char Message;
      USART2 ->CR1 |= USART_CR1_RE;
@@ -75,6 +77,8 @@ void uart_rx() {
 
   
 }
+
+// configuration du UART 2
 void uart2_config(void)
 {
   
