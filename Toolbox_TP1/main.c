@@ -68,9 +68,7 @@ void wait(uint32_t tmp)
 
 void main()
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 
 //GPIO_init_USART2();
      //uart2_config();
@@ -78,63 +76,43 @@ void main()
      
   //enable_interrupt_ext();       // On active les interruptions externe
   //init_gpio_bouton_poussoir();                    // On lance le programme d'initialisation des boutons poussoirs
-=======
-=======
->>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
-=======
->>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
+
 GPIO_init_USART2();
 uart2_config();   
-  init_led();                   // On lance le programme d'initialisation des leds
-  enable_interrupt_ext();       // On active les interruptions externe
-  init_gpio_bouton_poussoir();                    // On lance le programme d'initialisation des boutons poussoirs
->>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
+Init_Led();                   // On lance le programme d'initialisation des leds
+enable_interrupt_ext();       // On active les interruptions externe
+init_gpio_bouton_poussoir();                    // On lance le programme d'initialisation des boutons poussoirs
+
 
   /* int index;*/
  
-  GPIOB->ODR &= ~ ((GPIO_ODR_ODR_1) | (GPIO_ODR_ODR_2));     // Led eteinte sous la mise sous tension Cours 1 Slide 43 On active le registre en OUTPUT
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+GPIOB->ODR &= ~ ((GPIO_ODR_ODR_1) | (GPIO_ODR_ODR_2));     // Led eteinte sous la mise sous tension Cours 1 Slide 43 On active le registre en OUTPUT
 
-  etat =0;
-  etat1 =0;
+etat =0;
+etat_interuption =0;
+init_SPI();
+init_MAX();
+init_TIM2();
+enable_interrupt_ext();
   
-  Init_Led();
 
-
-
-=======
->>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
-=======
->>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
   
 init_SPI();
-  init_MAX();
-  init_TIM2();
-  enable_interrupt_ext();
+init_MAX();
+init_TIM2();
+enable_interrupt_ext();
   
-<<<<<<< HEAD
-=======
-  
-init_SPI();
-  init_MAX();
-  init_TIM2();
-  enable_interrupt_ext();
-  
->>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
-=======
->>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
-  SPI_Write(0x09,0x00); // code B decode desactivé
+SPI_Write(0x09,0x00); // code B decode desactivé
 
   while(1)
   {
-    clignotement_LED();
+ 
+    
     if((GPIOA->IDR & (GPIO_IDR_IDR_11)) == 0)      /* when the BP is pushed (pull down) the state variable is checked */
     {
     
     }
-    //uart_rx();
+    uart_rx();
      // uart_rx();
        /* Program Scrutation */
 

@@ -26,7 +26,7 @@
 
 #include "stm32l1xx_nucleo.h"
 
-/* **************protype************** */
+/* **************protype***********²*** */
 void test(void);
 void uart_rx();
 void uart_tx(char);
@@ -36,10 +36,12 @@ void uart2_config(void);
 
 void init_gpio_bouton_poussoir(void);
 void enable_interrupt_ext(void);
-void init_led(void);
+void Init_Led(void);
 void led_eteinte (void);
 void led(void);
+void clignotement_LED(void);
 
+void Delay(uint32_t Tempo);
 
 // SPI
 

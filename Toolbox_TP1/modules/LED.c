@@ -62,7 +62,8 @@ void Init_Led()
 void clignotement_LED()
 {
     int i = 0;
-    
+    while (i < 10)
+    {
     GPIOB->ODR |= GPIO_ODR_ODR_1; //passage du port 1 du GPIOB à 1 (allumage)
     Delay(50000);
     GPIOB->ODR |= GPIO_ODR_ODR_2;
@@ -112,4 +113,5 @@ void clignotement_LED()
     GPIOB->ODR &=~ GPIO_ODR_ODR_15;
     Delay(50000);
     i++;
+    }
 }

@@ -67,14 +67,10 @@ void uart_rx() {
      while ((USART2 ->SR & USART_SR_RXNE)==0);
      Message= USART2->DR;
      if (Message == 'O'){
-       
-     led ();
+      SPI_Write_chaine_carac("OPENING");
+       clignotement_LED();
      }
-     else 
-     {
-       led_eteinte();
-       
-     }
+
 
   
 }
