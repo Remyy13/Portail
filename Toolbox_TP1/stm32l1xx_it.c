@@ -171,7 +171,7 @@ void EXTI15_10_IRQHandler()    //car PA11 et PA12
 {
     if(EXTI->PR & (EXTI_PR_PR11))
     {
-      Message_to_TX='O';
+      Message_to_TX='I';
       uart_tx(Message_to_TX);
       EXTI->PR |= (EXTI_PR_PR11); // cours 2 slide 26 (est ce que j'ai recu une demande d'interruption //  on le met à 1 pour faire un reset
       etat=~etat;//p26
