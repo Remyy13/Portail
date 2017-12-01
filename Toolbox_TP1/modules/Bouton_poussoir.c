@@ -14,7 +14,7 @@ void init_gpio_bouton_poussoir(void)
       GPIOA->PUPDR &= ~((GPIO_PUPDR_PUPDR11_0) | (GPIO_PUPDR_PUPDR11_1));     /* set PUDR of BP1 to 00 floating in this case */    
       GPIOA->PUPDR &= ~((GPIO_PUPDR_PUPDR12_0) | (GPIO_PUPDR_PUPDR12_1));     /* set PUDR of BP1 to 00 floating in this case */
 }
-
+/*
 void enable_interrupt_ext(void)
 {
   NVIC->ISER[1] |= NVIC_ISER_SETENA_8;              // PA11 et PA12 Bit 8 vecteur d'interruption 40 cours 2 slide 40 
@@ -29,4 +29,4 @@ void enable_interrupt_ext(void)
 
   SYSCFG->EXTICR[3] &= ~ SYSCFG_EXTICR3_EXTI8_PA;         // 8.5.4 Cours 2 Slide 27
                                                           // on est sur PA12 donc registre EXTICR[3] donc 0000 car on est sur A                                                     //BTN2
-}
+}*/

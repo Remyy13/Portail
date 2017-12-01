@@ -52,13 +52,13 @@
 //      - On configure l'Etat Initial (Le portail est fermé)
 
 
+//Variables
+
+//uint8_t etat;
 
 
-  uint8_t etat;
-  uint8_t etat1;
-
-
-
+ uint8_t etat;
+  uint8_t etat_interuption;
 
 void wait(uint32_t tmp)
 {
@@ -68,26 +68,23 @@ void wait(uint32_t tmp)
 
 void main()
 {
-
 GPIO_init_USART2();
-     uart2_config();
-  
-     
+uart2_config();   
   init_led();                   // On lance le programme d'initialisation des leds
   enable_interrupt_ext();       // On active les interruptions externe
   init_gpio_bouton_poussoir();                    // On lance le programme d'initialisation des boutons poussoirs
 
   /* int index;*/
-
-  
+ 
   GPIOB->ODR &= ~ ((GPIO_ODR_ODR_1) | (GPIO_ODR_ODR_2));     // Led eteinte sous la mise sous tension Cours 1 Slide 43 On active le registre en OUTPUT
-
-  etat =0;
-  etat1 =0;
-
-
-
   
+init_SPI();
+  init_MAX();
+  init_TIM2();
+  enable_interrupt_ext();
+  
+  SPI_Write(0x09,0x00); // code B decode desactivé
+
   while(1)
   {
     if((GPIOA->IDR & (GPIO_IDR_IDR_11)) == 0)      /* when the BP is pushed (pull down) the state variable is checked */
@@ -129,5 +126,5 @@ GPIO_init_USART2();
     
   }
   
-}
 
+}
