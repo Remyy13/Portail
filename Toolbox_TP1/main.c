@@ -52,13 +52,13 @@
 //      - On configure l'Etat Initial (Le portail est fermé)
 
 
+//Variables
+
+//uint8_t etat;
 
 
-  uint8_t etat;
-  uint8_t etat1;
-
-
-
+ uint8_t etat;
+  uint8_t etat_interuption;
 
 void wait(uint32_t tmp)
 {
@@ -68,33 +68,64 @@ void wait(uint32_t tmp)
 
 void main()
 {
+<<<<<<< HEAD
+<<<<<<< HEAD
 
-GPIO_init_USART2();
-     uart2_config();
+//GPIO_init_USART2();
+     //uart2_config();
   
      
+  //enable_interrupt_ext();       // On active les interruptions externe
+  //init_gpio_bouton_poussoir();                    // On lance le programme d'initialisation des boutons poussoirs
+=======
+=======
+>>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
+GPIO_init_USART2();
+uart2_config();   
   init_led();                   // On lance le programme d'initialisation des leds
   enable_interrupt_ext();       // On active les interruptions externe
   init_gpio_bouton_poussoir();                    // On lance le programme d'initialisation des boutons poussoirs
+>>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
 
   /* int index;*/
-
-  
+ 
   GPIOB->ODR &= ~ ((GPIO_ODR_ODR_1) | (GPIO_ODR_ODR_2));     // Led eteinte sous la mise sous tension Cours 1 Slide 43 On active le registre en OUTPUT
+<<<<<<< HEAD
+<<<<<<< HEAD
 
   etat =0;
   etat1 =0;
-
-
-
   
+  Init_Led();
+
+
+
+=======
+>>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
+  
+init_SPI();
+  init_MAX();
+  init_TIM2();
+  enable_interrupt_ext();
+  
+=======
+  
+init_SPI();
+  init_MAX();
+  init_TIM2();
+  enable_interrupt_ext();
+  
+>>>>>>> 821ccef33f9e2a98f263680e3837b96f4481ff17
+  SPI_Write(0x09,0x00); // code B decode desactivé
+
   while(1)
   {
+    clignotement_LED();
     if((GPIOA->IDR & (GPIO_IDR_IDR_11)) == 0)      /* when the BP is pushed (pull down) the state variable is checked */
     {
     
     }
-    uart_rx();
+    //uart_rx();
      // uart_rx();
        /* Program Scrutation */
 
@@ -129,5 +160,5 @@ GPIO_init_USART2();
     
   }
   
-}
 
+}
